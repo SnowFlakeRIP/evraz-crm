@@ -1,32 +1,29 @@
-const { test } = require('../../handlers/test/handler');
+const { createCourse } = require('../../handlers/curse/handler');
 
 module.exports = function (fastify, opts, next) {
-    
+
     fastify.route({
-        url:    '/test',
-        method: 'GET',
+        url: '/create',
+        method: 'POST',
         schema: {
-            response: {
-                200: {
-                    type:       'object',
-                    properties: {
-                        message:    {
-                            type:       'object',
-                            properties: {
-                                success: { type: 'boolean' },
-                            },
-                        },
-                        statusCode: { type: 'number' },
+            body: {
+                type: 'object',
+                properties: {
+                    courseName:{
+                        type:'string',
+                    },
+                    courseDescription:{
+                        type:'string',
                     },
                 },
             },
         },
-        async handler(request, reply) {
-            const data = await test();
+        async handler(request,reply) {
+            const data = await createCourse(request.body);
             reply.status(data.statusCode)
-            reply.send(data);
-        },
-    });
+            reply.send(data)
+        }
+    })
     
     next();
 };
