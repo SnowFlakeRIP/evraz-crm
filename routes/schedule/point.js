@@ -1,5 +1,4 @@
 const { createSchedule } = require('../../handlers/schedule/handler');
-const {test} = require("../../handlers/test/handler");
 
 module.exports = function (fastify, opts, next) {
 
@@ -10,11 +9,26 @@ module.exports = function (fastify, opts, next) {
             body: {
                 type:       'object',
                 properties: {
+                    name: {
+                        type: 'string'
+                    },
                     groupId:     {
                         type: 'number',
                     },
                     userId: {
                         type: 'number',
+                    },
+                    startDate: {
+                        type: 'string'
+                    },
+                    endDate: {
+                        type: 'string'
+                    },
+                    isDone: {
+                        type: 'boolean'
+                    },
+                    visiting: {
+                        type: 'object'
                     },
                 },
             },

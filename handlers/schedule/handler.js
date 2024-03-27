@@ -15,14 +15,20 @@ async function createSchedule(object) {
     const client = await pool.connect();
 
     try {
-        const createSchedule = await client.query(`INSERT INTO schedule ("groupId", "userId")
-                                                   VALUES ($1, $2)`,
+        const createSchedule = await client.query(`INSERT INTO schedule ("name", "groupId", "userId", "startDate", "endDate", "isDone", "visiting")
+                                                   VALUES ($1, $2, $3, $4, $5, $6, $7)`,
             [
+                object.name,
                 object.groupId,
                 object.userId,
+                object.startDate,
+                object.endDate,
+                object.isDone,
+                object.visiting,
             ]
         );
 
+        //исправь это чудо, оно работает всегда
         if (createSchedule.rowCount === 0 || createSchedule.rows.length === 0) {
             console.log(`${ funcName }: Запрос на создание расписания не выполнен`);
             data.message = 'Запрос на создание расписания не выполнен';
@@ -43,5 +49,5 @@ async function createSchedule(object) {
 }
 
 module.exports = {
-    createSchedule,
+    createSchedule: createSchedule,
 };
