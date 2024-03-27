@@ -1,9 +1,9 @@
-const { createSchedule } = require('../../handlers/schedule/handler');
+const { addEventToSchedule } = require('../../handlers/schedule/handler');
 
 module.exports = function (fastify, opts, next) {
 
     fastify.route({
-        url:    '/create',
+        url:    '/add',
         method: 'POST',
         schema: {
             body: {
@@ -34,7 +34,7 @@ module.exports = function (fastify, opts, next) {
             },
         },
         async handler(request, reply) {
-            const data = await createSchedule(request.body);
+            const data = await addEventToSchedule(request.body);
             reply.status(data.statusCode)
             reply.send(data)
         },
