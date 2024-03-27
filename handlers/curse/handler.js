@@ -10,20 +10,27 @@ async function createCourse(object) {
     const client = await pool.connect()
 
     try {
-        const createCourse = await client.query(`insert into courses ("courseName","courseDescription") 
-values ($1,$2) returning "courseId"`,
+        const createCourse = await client.query(`insert into courses ("courseName","courseDescription","numberOfHours","schedule") 
+values ($1,$2,$3,$4) returning "courseId"`,
             [
                 object.courseName,
-                object.courseDescription
+                object.courseDescription,
+                object.numberOfHours,
+                object.schedule
             ])
+        data =  {
+            message: 'все хоршо',
+            statusCode: 200
+        }
 
     } catch (err){
         console.log(`${funcName}:error`)
+        console.log(err)
     } finally {
         client.release()
         console.log(`${funcName}: client release()`);
     }
-    return date
+    return data
 
 }
 module.exports = {

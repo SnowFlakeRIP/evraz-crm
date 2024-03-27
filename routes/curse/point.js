@@ -15,6 +15,12 @@ module.exports = function (fastify, opts, next) {
                     courseDescription:{
                         type:'string',
                     },
+                    numberOfHours:{
+                        type:'integer',
+                    },
+                    schedule:{
+                        type:'string',
+                    },
                 },
             },
         },
