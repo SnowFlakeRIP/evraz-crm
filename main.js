@@ -7,6 +7,11 @@ const fastify = require('fastify')({
 fastify.register(autoload, {
     dir: path.join(__dirname, './routes'),
 });
+fastify.register(require(`./hooks/authorization.js`))
+fastify.register(require(`@fastify/cors`), {
+    origin: `${process.env.API_CLIENT_URL}`,
+    methods: ["GET", "POST", "PUT", "DELETE"]
+})
 
 const start = async () => {
     try {
