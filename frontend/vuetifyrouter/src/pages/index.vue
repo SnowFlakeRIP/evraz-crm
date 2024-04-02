@@ -2,10 +2,10 @@
   <div class="container">
     <div class="centered">
       <v-text-field
-      v-model="login" placeholder="Логин/Электронная почта/номер телефона"
+      v-model="login" placeholder="Электронная почта/номер телефона"
       :rules="rules"
       hide-details="auto"
-      label="Main input"
+      label="Электронная почта/номер телефона"
     ></v-text-field>
       <v-text-field
       placeholder="Пароль"
@@ -13,7 +13,7 @@
       :type="isPwd ? 'text' : 'password'"
       :rules="rules"
       hide-details="auto"
-      label="Main input"
+      label="Пароль"
     ></v-text-field>
       <v-btn>Войти</v-btn>
     </div>
@@ -47,7 +47,8 @@ export default{
               if(this.ValidPhone(this.$data.login)){
                   request.phone = this.$data.login
               }else{
-                  request.login = this.$data.login
+                  alert("Наверно указан телефон или электронная почта")
+                  return
               }
           }
           console.log(request)
