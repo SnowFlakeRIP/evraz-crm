@@ -44,26 +44,26 @@ async function addEventToSchedule(object) {
     return data;
 }
 
-async function checkAllEventsOfSchedule() {
+async function checkAllEventsFromSchedule() {
     const data = {
         message: 'error',
         statusCode: 400
     };
 
-    const funcName = 'checkAllEventsOfSchedule';
+    const funcName = 'checkAllEventsFromSchedule';
     const client = await pool.connect();
 
     try {
-        const checkAllEventsOfSchedule = await client.query(`SELECT *
-                                                             FROM schedule`);
+        const checkAllEventsFromSchedule = await client.query(`SELECT *
+                                                               FROM schedule`);
 
-        if (checkAllEventsOfSchedule === undefined) {
+        if (checkAllEventsFromSchedule.rowCount === 0) {
             console.log(`${ funcName }: Запрос на просмотр расписания не выполнен`);
             data.message = 'Запрос на просмотр расписания не выполнен'
             return data;
         }
 
-        data.message = checkAllEventsOfSchedule.rows;
+        data.message = checkAllEventsFromSchedule.rows;
         data.statusCode = '200';
     } catch (err) {
         console.log(`${ funcName }: CATCH ERROR`);
@@ -76,7 +76,58 @@ async function checkAllEventsOfSchedule() {
     return data;
 }
 
+// Фикс
+async function checkEventFromSchedule(object) {
+    const data = {
+        message: 'error',
+        statusCode: 400
+    };
+
+    const funcName = 'checkEventFromSchedule';
+    const client = await pool.connect();
+
+    try {
+        const checkEventFromSchedule = await client.query(`SELECT *
+                                                           FROM schedule
+                                                           WHERE "id" = $1`,
+            [
+                object.eventId,
+            ]
+        );
+
+        if (checkEventFromSchedule.rowCount === 0) {
+            console.log(`${ funcName }: Запрос на просмотр мероприятия не выполнен`);
+            data.message = 'Запрос на просмотр мероприятия не выполнен'
+            return data;
+        }
+
+        data.message = checkEventFromSchedule.rows;
+        data.statusCode = '200';
+    } catch (err) {
+        console.log(`${ funcName }: CATCH ERROR`);
+        console.log(err.message, err.stack);
+    } finally {
+        client.release();
+        console.log(`${ funcName }: client release()`);
+    }
+
+    return data;
+}
+
+// Доделать
+// async function deleteEventOfSchedule(object) {
+//     const data = {
+//         message: 'error',
+//         statusCode: 400
+//     };
+//
+//     const funcName = "deleteEventOfSchedule";
+//     const client = await pool.connect();
+// }
+
 module.exports = {
     addEventToSchedule: addEventToSchedule,
-    checkAllEventsOfSchedule: checkAllEventsOfSchedule,
+    checkAllEventsFromSchedule: checkAllEventsFromSchedule,
+    checkEventFromSchedule: checkEventFromSchedule,
+    // deleteEventOfSchedule: deleteEventOfSchedule,
 };
