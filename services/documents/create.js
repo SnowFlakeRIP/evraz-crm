@@ -13,7 +13,7 @@ function firstForm (data) {
             {
                 text:'ЗАЯВЛЕНИЕ',
                 style:{
-                    bold:true
+                    bold:true,
                 },
                 alignment: 'center',
                 margin: [0, 20, 0, 0]

@@ -1,4 +1,4 @@
-const { pool } = require('../../dependencies');
+// const { pool } = require('../../dependencies');
 const fs = require('fs')
 async function getTestData(object) {
     const data = {
@@ -7,7 +7,7 @@ async function getTestData(object) {
     };
     
     const funcName = 'getTestData';
-    const client = await pool.connect();
+    // const client = await pool.connect();
     
     try {
         // const dataFromDatabase = await client.query(``)
@@ -38,7 +38,7 @@ async function getTestData(object) {
         console.log(err.message, err.stack);
     }
     finally {
-        client.release();
+        // client.release();
         console.log(`${ funcName }: client release()`);
     }
     
@@ -69,8 +69,10 @@ async function docFileFromStream(document, path, isUpload, isHand = false) {
                     }
                 }
             });
+
             document.on('error', reject);
             document.end();
+
         }
         catch (error) {
             console.log('docFileFromStream ERROR');
