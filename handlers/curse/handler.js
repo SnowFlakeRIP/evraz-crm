@@ -33,6 +33,73 @@ values ($1,$2,$3,$4) returning "courseId"`,
     return data
 
 }
+
+async function deleteCourse(object){
+    let data = {
+        message:'error',
+        statusCode:400
+    }
+    let client = await pool.connect()
+    let funcName = 'deleteCourse'
+    try {
+        const deleteCourse = await client.query(`delete from courses where "courseId" = $1`,[object.courseId])
+        data = 'good'
+    }catch (err) {
+        console.log(`${funcName}: CATCH ERROR`);
+        console.log(err.message, err.stack);
+    }finally {
+        client.release()
+        console.log(`${funcName}: client release()`);
+    }
+    return data
+}
+
+
+async function getCourses(){
+    let data = {
+        message: 'error',
+        statusCode: 400
+    }
+    let client = await pool.connect()
+    let funcName = 'getCourses'
+    try {
+        const getCourses = await client.query(`select "courseName","courseDescription" from courses`)
+        data.message =   getCourses.rows
+        data.statusCode = 200
+
+    } catch (err) {
+        console.log(`${funcName}: CATCH ERROR`);
+        console.log(err.message, err.stack);
+    } finally {
+        client.release()
+        console.log(`${funcName}: client release()`);
+    }
+    return data
+}
+async function getCourse(object){
+    let data = {
+        message: 'error',
+        statusCode: 400
+    }
+    let client = await pool.connect()
+    let funcName = 'getCourse'
+    try {
+        const getCourse = await client.query(`select * from courses where "courseId" = $1`,[object.courseId])
+        data.message =   getCourse.rows
+        data.statusCode = 200
+
+    } catch (err) {
+        console.log(`${funcName}: CATCH ERROR`);
+        console.log(err.message, err.stack);
+    } finally {
+        client.release()
+        console.log(`${funcName}: client release()`);
+    }
+    return data
+}
 module.exports = {
-    createCourse:createCourse
+    createCourse:createCourse,
+    deleteCourse:deleteCourse,
+    getCourses:getCourses,
+    getCourse:getCourse
 }
