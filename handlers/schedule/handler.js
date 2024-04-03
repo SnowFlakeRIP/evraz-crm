@@ -1,10 +1,6 @@
-const {pool} = require('../../dependencies');
+const { pool } = require('../../dependencies');
 
-/**
- * Создание расписания
- * @param object
- * @returns {Promise<{message: string, statusCode: number}>}
- */
+// Дополнить
 async function addEventToSchedule(object) {
     const data = {
         message: 'error',
@@ -29,14 +25,14 @@ async function addEventToSchedule(object) {
         );
 
         //исправь это чудо, оно работает всегда
-        if (addEventToSchedule.rowCount === 0 || addEventToSchedule.rows.length === 0) {
+        if (addEventToSchedule.rowCount === 0) {
             console.log(`${funcName}: Запрос на добавление мероприятия не выполнен`);
             data.message = 'Запрос на добавление мероприятия не выполнен';
             return data;
         }
 
-        data.message = 'Successful'
-        data.statusCode = '200'
+        data.message = 'Successful';
+        data.statusCode = '200';
     } catch (err) {
         console.log(`${funcName}: CATCH ERROR`);
         console.log(err.message, err.stack);
@@ -48,6 +44,39 @@ async function addEventToSchedule(object) {
     return data;
 }
 
+async function checkAllEventsOfSchedule() {
+    const data = {
+        message: 'error',
+        statusCode: 400
+    };
+
+    const funcName = 'checkAllEventsOfSchedule';
+    const client = await pool.connect();
+
+    try {
+        const checkAllEventsOfSchedule = await client.query(`SELECT *
+                                                             FROM schedule`);
+
+        if (checkAllEventsOfSchedule === undefined) {
+            console.log(`${ funcName }: Запрос на просмотр расписания не выполнен`);
+            data.message = 'Запрос на просмотр расписания не выполнен'
+            return data;
+        }
+
+        data.message = checkAllEventsOfSchedule.rows;
+        data.statusCode = '200';
+    } catch (err) {
+        console.log(`${ funcName }: CATCH ERROR`);
+        console.log(err.message, err.stack);
+    } finally {
+        client.release();
+        console.log(`${ funcName }: client release()`);
+    }
+
+    return data;
+}
+
 module.exports = {
     addEventToSchedule: addEventToSchedule,
+    checkAllEventsOfSchedule: checkAllEventsOfSchedule,
 };

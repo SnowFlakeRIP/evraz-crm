@@ -1,4 +1,5 @@
 const { addEventToSchedule } = require('../../handlers/schedule/handler');
+const { checkAllEventsOfSchedule } = require('../../handlers/schedule/handler');
 
 module.exports = function (fastify, opts, next) {
 
@@ -35,6 +36,16 @@ module.exports = function (fastify, opts, next) {
         },
         async handler(request, reply) {
             const data = await addEventToSchedule(request.body);
+            reply.status(data.statusCode)
+            reply.send(data)
+        },
+    });
+
+    fastify.route({
+        url: '/check',
+        method: 'GET',
+        async handler(request, reply) {
+            const data = await checkAllEventsOfSchedule();
             reply.status(data.statusCode)
             reply.send(data)
         },
