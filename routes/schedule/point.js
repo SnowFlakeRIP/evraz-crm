@@ -70,7 +70,6 @@ module.exports = function (fastify, opts, next) {
 
         async handler(request, reply) {
             const data = await checkEventFromScheduleById(request.query);
-            console.log(request)
             reply.status(data.statusCode);
             reply.send(data);
         },

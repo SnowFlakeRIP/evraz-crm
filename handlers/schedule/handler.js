@@ -85,7 +85,6 @@ async function checkEventFromScheduleById(object) {
 
     const funcName = 'checkEventFromScheduleById';
     const client = await pool.connect();
-    console.log(object)
 
     try {
         const checkEventFromScheduleById = await client.query(`SELECT *
