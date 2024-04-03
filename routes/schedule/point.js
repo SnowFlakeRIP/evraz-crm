@@ -1,4 +1,4 @@
-const { createLesson, getLesson } = require('../../handlers/schedule/handler');
+const { createLesson, getLesson, updateLesson } = require('../../handlers/schedule/handler');
 
 module.exports = function (fastify, opts, next) {
     
@@ -39,6 +39,37 @@ module.exports = function (fastify, opts, next) {
         },
         async handler(request, reply) {
             const data = await getLesson(request.query);
+            reply.status(data.statusCode)
+            reply.send(data);
+        },
+    });
+
+    fastify.route({
+        url:    '/',
+        method: 'PUT',
+        schema: {
+            body: {
+                type: 'object',
+                properties: {
+                    lessonId: {type: 'number'},
+                    lessonName: {type: 'string'},
+                    teacherId: {type: 'number'},
+                    groupId: {type: 'number'},
+                    startDate: {type: 'number'},
+                    endDate: {type: 'number'},
+                    isDone: {type: 'boolean'},
+                    visiting: {
+                        type: 'object',
+                        patternProperties: {
+                            "^\\d+$": {enum: ["not_visited", "visited", "sick", "good_reason"]}
+                        }
+                    }
+                },
+                required: ['lessonId']
+            }
+        },
+        async handler(request, reply) {
+            const data = await updateLesson(request.body);
             reply.status(data.statusCode)
             reply.send(data);
         },
