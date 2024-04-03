@@ -1,4 +1,4 @@
-const { createMessage ,login,} = require('../../handlers/chat/handler');
+const { createMessage ,login, updateMessage} = require('../../handlers/chat/handler');
 const { pool } = require('../../dependencies');
 
 module.exports = function (fastify, opts, next) {
@@ -30,6 +30,15 @@ module.exports = function (fastify, opts, next) {
         method: 'POST',
         async handler(request, reply) {
             const data = await createMessage(request.body);
+            reply.status(data.statusCode);
+            reply.send(data);
+        },
+    });
+    fastify.route({
+        url:    '/update',
+        method: 'POST',
+        async handler(request, reply) {
+            const data = await updateMessage(request.body);
             reply.status(data.statusCode);
             reply.send(data);
         },

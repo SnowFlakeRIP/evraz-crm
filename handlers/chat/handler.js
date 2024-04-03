@@ -56,6 +56,8 @@ async function createMessage(object) {
         console.log("все зашибись")
         // const createUser = await  client.query(`INSERT INTO chat("userPhone","userEmail","userPassword")
         //                                         VALUES `)
+        data.message="excellent"
+        data.statusCode=200
     }
     catch (err) {
         console.log(`${ funcName }: CATCH ERROR`);
@@ -67,6 +69,35 @@ async function createMessage(object) {
     }
     
     return data;
+}
+async function updateMessage(object){
+    const data = {
+        message:    'error',
+        statusCode: 400,
+        messageValue:[]
+    };
+    const  funcName = 'updateMessage'
+    const client = await pool.connect()
+    try {
+        const message = await client.query(`select "messageValue"
+                                         from message
+                                         where "userId"=$1`,[object.userId])
+
+        data.message="excellent"
+        data.statusCode=200
+        data.messageValue=message.rows
+    }
+    catch (err) {
+        console.log(`${ funcName }: CATCH ERROR`);
+        console.log(err.message, err.stack);
+    }
+    finally {
+        client.release();
+        console.log(`${ funcName }: client release()`);
+    }
+
+    return data;
+
 }
 async function login(object){
     const data={
@@ -115,4 +146,5 @@ async function login(object){
 module.exports = {
     createMessage: createMessage,
     login:login,
+    updateMessage: updateMessage
 };
