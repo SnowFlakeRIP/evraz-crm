@@ -77,17 +77,17 @@ async function checkAllEventsFromSchedule() {
 }
 
 // Фикс
-async function checkEventFromSchedule(object) {
+async function checkEventFromScheduleById(object) {
     const data = {
         message: 'error',
         statusCode: 400
     };
 
-    const funcName = 'checkEventFromSchedule';
+    const funcName = 'checkEventFromScheduleById';
     const client = await pool.connect();
-
+    console.log(object)
     try {
-        const checkEventFromSchedule = await client.query(`SELECT *
+        const checkEventFromScheduleById = await client.query(`SELECT *
                                                            FROM schedule
                                                            WHERE "id" = $1`,
             [
@@ -95,13 +95,13 @@ async function checkEventFromSchedule(object) {
             ]
         );
 
-        if (checkEventFromSchedule.rowCount === 0) {
+        if (checkEventFromScheduleById.rowCount === 0) {
             console.log(`${ funcName }: Запрос на просмотр мероприятия не выполнен`);
             data.message = 'Запрос на просмотр мероприятия не выполнен'
             return data;
         }
 
-        data.message = checkEventFromSchedule.rows;
+        data.message = checkEventFromScheduleById.rows;
         data.statusCode = '200';
     } catch (err) {
         console.log(`${ funcName }: CATCH ERROR`);
@@ -128,6 +128,6 @@ async function checkEventFromSchedule(object) {
 module.exports = {
     addEventToSchedule: addEventToSchedule,
     checkAllEventsFromSchedule: checkAllEventsFromSchedule,
-    checkEventFromSchedule: checkEventFromSchedule,
+    checkEventFromScheduleById: checkEventFromScheduleById,
     // deleteEventOfSchedule: deleteEventOfSchedule,
 };

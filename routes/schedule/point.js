@@ -1,6 +1,6 @@
 const { addEventToSchedule } = require('../../handlers/schedule/handler');
 const { checkAllEventsFromSchedule } = require('../../handlers/schedule/handler');
-const { checkEventFromSchedule } = require('../../handlers/schedule/handler')
+const { checkEventFromScheduleById } = require('../../handlers/schedule/handler')
 
 module.exports = function (fastify, opts, next) {
 
@@ -55,7 +55,7 @@ module.exports = function (fastify, opts, next) {
     });
 
     fastify.route({
-        url: '/checkEvent',
+        url: '/checkEventById',
         method: 'GET',
         schema: {
             querystring: {
@@ -69,7 +69,8 @@ module.exports = function (fastify, opts, next) {
         },
 
         async handler(request, reply) {
-            const data = await checkEventFromSchedule();
+            const data = await checkEventFromScheduleById(request.query);
+            console.log(request)
             reply.status(data.statusCode);
             reply.send(data);
         },
