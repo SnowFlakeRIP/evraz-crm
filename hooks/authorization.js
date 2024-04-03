@@ -5,7 +5,7 @@ const fp = require(`fastify-plugin`)
 
 module.exports = fp((fastify, options, next) => {
     fastify.addHook(`preHandler`, (request, reply, next) => {
-        if (request.method === `OPTIONS` || request.url === `/users/auth/register` || request.url === `/users/auth/login` || request.url === `/users/auth/refresh`) {
+        if (request.method === `OPTIONS` || request.url === `/users/auth/login` || request.url === `/users/auth/refresh`) {
             return next()
         }
 
@@ -31,6 +31,7 @@ module.exports = fp((fastify, options, next) => {
             }
             next()
         } catch(err) {
+            console.error(err)
             return reply.status(403).send({ message: `Access Token Invalid` })
         }
     })

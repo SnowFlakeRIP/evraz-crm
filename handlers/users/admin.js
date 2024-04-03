@@ -8,12 +8,16 @@ class Admin {
         const client = await pool.connect()
 
         try {
-            const { id, email, password, name, middleName, lastName, age, address, role, phone } = request.body
+            const { id, email, password, name, middleName, lastName, age, role, phone } = request.body
 
             const adminCheck = await client.query(`SELECT * FROM users WHERE "userId" = $1`, [id])
 
             if (adminCheck.rows[0].userRole !== `3`) {
                 return reply.status(403).send({ message: `Нет доступа!` })
+            }
+
+            if (!email || !password || !name || !middleName || !lastName || !age || !role || !phone) {
+                return reply.status(400).send({ message: `Вы не указали какие-то данные!` })
             }
 
             if (password.length < 5) {
@@ -24,10 +28,6 @@ class Admin {
 
             if (UpdatedUser.rows.length < 1) {
                 return reply.status(404).send({ message: `Пользователь не найден!` })
-            }
-
-            if (!email || !password || !name || !middleName || !lastName || !age || !address || !role || !phone) {
-                return reply.status(400).send({ message: `Вы не указали какие-то данные!` })
             }
 
             const hashPassword = await bcrypt.hash(password, 3)
@@ -52,15 +52,19 @@ class Admin {
         const client = await pool.connect()
 
         try {
-            const { userEmail, userPassword, userPhone, userName, userAge, userAddress, userMiddleName, userLastName, id, role } = request.body
+            const { userEmail, userPassword, userPhone, userName, userAge, userMiddleName, userLastName, id, role } = request.body
 
             const adminCheck = await client.query(`SELECT * FROM users WHERE "userId" = $1`, [id])
+
+            if (!adminCheck.rows[0]) {
+                return reply.status(404).send({ message: "Admin Not Found" })
+            }
 
             if (adminCheck.rows[0].userRole !== `3`) {
                 return reply.status(403).send({ message: `У вас нет доступа!` })
             }
 
-            if (!userPassword || !userEmail || !userPhone || !userName || !userAge || !userAddress || !userMiddleName || !userLastName || !role) {
+            if (!userPassword || !userEmail || !userPhone || !userName || !userAge || !userMiddleName || !userLastName || !role) {
                 return reply.status(400).send({ message: `Вы не указали какие-то данные` })
             }
 
@@ -108,6 +112,12 @@ class Admin {
 
             if (adminCheck.rows[0].userRole !== `3`) {
                 return reply.status(403).send({ message: `Нет доступа!` })
+            }
+
+            const userCheck = await client.query(`SELECT * FROM users WHERE "userEmail" = $1`, [email])
+
+            if (userCheck.rows.length < 1) {
+                return reply.status(404).send({ message: `Пользователь не найден!` })
             }
 
             const DeleteUserId = await client.query(`DELETE FROM users WHERE "userEmail" = $1 RETURNING "userId"`, [email])

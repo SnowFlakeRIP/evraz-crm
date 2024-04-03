@@ -5,7 +5,7 @@ module.exports = function (fastify, options, next) {
 
     fastify.post(`/admin/createUser`, Admin.createUser)
 
-    fastify.delete(`/admin/deleteUser`, Admin.deleteUser)
+    fastify.post(`/admin/deleteUser`, Admin.deleteUser)
 
     next()
 }

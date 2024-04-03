@@ -15,6 +15,7 @@ class Lk {
             await client.query(`UPDATE users SET "userPhone" = $1 WHERE "userId" = $2`, [phone, id])
             await client.query(`UPDATE bio SET "bioName" = $1, "bioMiddleName" = $2, "bioLastName" = $3 WHERE "userId" = $4`, [name, middleName, lastName, id])
 
+            console.log(`${funcName}: Успешное обновление пользователя!`)
             return reply.status(200).send({ message: `Пользователь успешно обновлен!` })
         } catch(err) {
             console.error(`${funcName} catch error`)
@@ -34,6 +35,7 @@ class Lk {
 
             await client.query(`UPDATE users SET "userActive" = $1 WHERE "userId" = $2`, [false, id])
 
+            console.log(`${funcName}: Успешная деактивация пользователя!`)
             return reply.status(200).send({ message: `Пользователь успешно деактивирован!` })
         } catch(err) {
             console.error(`${funcName} catch error`)
