@@ -1,4 +1,4 @@
-const { createLesson, getLesson, updateLesson } = require('../../handlers/schedule/handler');
+const { createLesson, getLesson, updateLesson, deleteLesson } = require('../../handlers/schedule/handler');
 
 module.exports = function (fastify, opts, next) {
     
@@ -70,6 +70,25 @@ module.exports = function (fastify, opts, next) {
         },
         async handler(request, reply) {
             const data = await updateLesson(request.body);
+            reply.status(data.statusCode)
+            reply.send(data);
+        },
+    });
+
+    fastify.route({
+        url:    '/',
+        method: 'DELETE',
+        schema: {
+            body: {
+                type: 'object',
+                properties: {
+                    lessonId: {type: 'number'},
+                },
+                required: ['lessonId']
+            }
+        },
+        async handler(request, reply) {
+            const data = await deleteLesson(request.body);
             reply.status(data.statusCode)
             reply.send(data);
         },

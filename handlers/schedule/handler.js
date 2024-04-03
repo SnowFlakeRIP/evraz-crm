@@ -169,7 +169,7 @@ async function updateLesson(object) {
         visiting = Object.assign(visiting, current.visiting)
 
         for (let uid in object.visiting ?? []) {
-            if (!uid.match(/^\d+$/)) continue
+            if (isNaN(+uid)) continue
             let user_visit = object.visiting[uid]
             const check_user = await client.query(`select * from users inner join usersgroups on usersgroups."userId" = users."userId" where users."userId" = $1 and usersgroups."groupId" = $2` , [uid, current.groupId])
             if (check_user.rows.length === 0) {
@@ -205,6 +205,38 @@ async function updateLesson(object) {
     return data;
 }
 
+async function deleteLesson(object) {
+    const data = {
+        message:    'error',
+        statusCode: 400,
+    };
+
+    const funcName = 'deleteLesson';
+    const client = await pool.connect()
+    const log = (m) => console.log(`${funcName}: ${m}`)
+
+    try {
+        const del_lesson = await client.query(`delete from schedule where id = $1`, [object.lessonId])
+        if (del_lesson.rowCount === 0) {
+            data.message = "Занятие не найдено или не удалено"
+            log(data.message)
+            return data
+        }
+
+        data.message = "Занятие удалено"
+        log(data.message)
+        data.statusCode = 200
+        return data
+    } catch (err) {
+        log(`CATCH ERROR`);
+        console.log(err.message, err.stack);
+    } finally {
+        client.release()
+    }
+
+    return data;
+}
+
 module.exports = {
-    createLesson, getLesson, updateLesson,
+    createLesson, getLesson, updateLesson, deleteLesson
 };
