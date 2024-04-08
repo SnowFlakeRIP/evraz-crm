@@ -1,6 +1,6 @@
 // const { pool } = require('../../dependencies');
 const fs = require('fs')
-async function getTestData(object) {
+async function getDataForDocPDF(object) {
     const data = {
         message:    'error',
         statusCode: 400,
@@ -82,8 +82,96 @@ async function docFileFromStream(document, path, isUpload, isHand = false) {
     });
 }
 
+async function createBasicXLSX(columns, rows) {
+    let data = {
+        buffer: null,
+        error:  null,
+    };
+
+    try {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Лист 1');
+        worksheet.columns = columns;
+        worksheet.addRows(rows);
+
+        // todo: textWrap?
+
+        data.buffer = await workbook.xlsx.writeBuffer();
+    } catch (e) {
+        data.error = e;
+    }
+
+    return data;
+}
+
+async function act2NotSigned() {
+    let data = {
+        message:    'error',
+        statusCode: 400,
+    };
+    let client = await pool.connect();
+
+    try {
+        const queryProjects = `SELECT CONCAT_WS(' ', b."bioLastname", b."bioName", b."bioMiddlename") AS "fio",
+                                      u."userPhone",
+                                      p."projectId",
+                                      TO_CHAR(p."projectDateGiveLoan", 'DD.MM.YYYY')                  AS "projectDateGiveLoan"
+                               FROM projects p
+                                        LEFT JOIN documents d
+                                                  ON ("documentMeta"::jsonb ->> 'projectId')::integer =
+                                                     p."projectId" AND d."documentType" = 13
+                                        INNER JOIN userprofile up ON p."projectOwner" = up.id
+                                        INNER JOIN users u ON up."userId" = u."userId"
+                                        INNER JOIN bio b ON u."bioId" = b."bioId"
+                               WHERE p."projectStatus" = ANY ('{3,4,5,6,7,13}')
+                                 AND p."projectPlatformRules" > 8
+                                 AND CASE
+                                         WHEN d."documentId" IS NOT NULL THEN d."documentSignId" IS NOT NULL
+                                         ELSE FALSE END IS FALSE
+                               ORDER BY p."projectDateGiveLoan" DESC`;
+        const resProjects = await client.query(queryProjects);
+
+        if (resProjects.rows.length > 0) {
+            const columns = [
+                { header: 'ФИО', key: 'fio', width: 45 },
+                { header: 'Телефон', key: 'userPhone', width: 13 },
+                { header: 'Номер проекта', key: 'projectId', width: 15 },
+                { header: 'Дата выдачи займа', key: 'projectDateGiveLoan', width: 20 },
+            ];
+
+            const { buffer, error } = await createXLSX(columns, resProjects.rows);
+
+            if (buffer) {
+                data.message = { data: buffer };
+                data.statusCode = 200;
+            }
+            else if (error) {
+                throw error;
+            }
+        }
+        else {
+            data.message = 'NOT FOUND';
+        }
+    } catch (e) {
+        winston.errorLog(e.stack, e.message);
+        data = {
+            message:    e.message,
+            statusCode: 400,
+        };
+    } finally {
+        client.release();
+        winston.infoLog('Release client');
+    }
+
+    return data;
+}
+
+
+
+
+
 module.exports = {
-    getTestData:       getTestData,
+    getDataForDocPDF:       getDataForDocPDF,
     docFileFromStream: docFileFromStream,
     
 };
