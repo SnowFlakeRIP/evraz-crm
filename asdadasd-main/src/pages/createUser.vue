@@ -10,13 +10,18 @@
         color="primary"
         label="Email"
         variant="underlined"
+        :rules="rules"
       ></v-text-field>
 
       <v-text-field
+        placeholder="Пароль"
         v-model="password"
-        color="primary"
+        :type="isPwd ? 'text' : 'password'"
+        :rules="rules"
+        hide-details="auto"
         label="Пароль"
-        variant="underlined"
+        :append-icon="isPwd ? 'mdi-eye' : 'mdi-eye-off'"
+        @click:append="isPwd = !isPwd"
       ></v-text-field>
 
       <v-text-field
@@ -24,9 +29,11 @@
         color="primary"
         label="Телефон"
         variant="underlined"
+        :rules="rules"
       ></v-text-field>
 
       <v-combobox
+        v-model="role"
         label="Роль"
         :items="['Ученик', 'Учитель', 'Администратор']"
       ></v-combobox>
@@ -37,6 +44,7 @@
         color="primary"
         label="Фамилия"
         variant="underlined"
+        :rules="rules"
       ></v-text-field>
 
       <v-text-field
@@ -44,6 +52,7 @@
         color="primary"
         label="Имя"
         variant="underlined"
+        :rules="rules"
       ></v-text-field>
 
       <v-text-field
@@ -51,6 +60,7 @@
         color="primary"
         label="Отчество"
         variant="underlined"
+        :rules="rules"
       ></v-text-field>
 
       <v-text-field
@@ -58,6 +68,7 @@
         color="primary"
         label="Возраст"
         variant="underlined"
+        :rules="rules"
       ></v-text-field>
 
 
@@ -68,8 +79,9 @@
     <v-card-actions>
       <v-spacer></v-spacer>
 
-      <v-btn color="success">
+      <v-btn color="success" @click="join">
         Создать пользователя
+
 
         <v-icon icon="mdi-chevron-right" end></v-icon>
       </v-btn>
@@ -77,8 +89,8 @@
   </v-card>
 </template>
 <script>
-import axios from 'axios';
 import { ref } from 'vue';
+import axios from 'axios';
 
 export default{
   data() {
@@ -91,23 +103,87 @@ export default{
       first:"",
       last:"",
       age:"",
+      role:"",
 
       isPwd: ref(false),
       rules: [
         value => !!value || 'Обязательно',
-        value => (value && value.length >= 3) || 'Min 3 characters',
+        value => (value && value.length >= 2) || 'Min 2 characters',
       ],
     }
-  }};
+  },
+  methods:{
+    join(
+      email,password,phone,middle,first,last,age,role
+    ){
+      const numberRole=this.getRole(this.$data.role)
+      const request = {
+        userEmail: this.$data.email,
+        userPassword: this.$data.password,
+        userPhone: this.$data.phone,
+        userMiddleName: this.$data.middle,
+        userName: this.$data.first,
+        userLastName: this.$data.last,
+        userAge: this.$data.age,
+        role: numberRole,
+      }
+      axios.post("http://192.168.1.104:3000/users/admin/createUser",request,{
+        headers:{
+          "Content-Type":"application/json",
+          Authorization:"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMiLCJpYXQiOjE3MTI1ODA4NjAsImV4cCI6MTcxMjU4MjY2MH0.I0mBD_aS4PuDzQ_2uGatB8faoQbuiKld9s3hY_cSkpk"
+        }
+      })
 
 
 
+      },
 
+    ValidMail(myMail) {
+      const re = /^[\w-\.]+@[\w-]+\.[a-z]{2,4}$/i;
+      return  re.test(myMail);
+    },
+    ValidPhone(myPhone) {
+      const re = /^[\d\+][\d\(\)\ -]{4,14}\d$/;
+      return re.test(myPhone);
+    },
+    getRole(role){
+      return (["Ученик","Учитель","Админ"].indexOf(role)+1)
+    },
 
+  }
+  }
 
 </script>
 
 
-<style scoped>
+<style>
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Устанавливаем высоту контейнера равную высоте видимой области страницы */
+}
 
+.centered {
+  width: 30vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 4px 4px 4px 6px rgb(130, 120, 120);
+}
+.centered *{
+
+  margin: 5px;
+}
+input, .v-field__field{
+  width: 30vw;
+  height: 8.45vh;
+  transition-delay: 15ms;
+}
+button{
+  text-align: center;
+}
+.q-btn {
+  z-index: 1; /* Установите значение z-index для кнопки */
+}
 </style>
