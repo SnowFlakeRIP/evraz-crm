@@ -7,5 +7,9 @@ module.exports = function (fastify, options, next) {
 
     fastify.post(`/admin/deleteUser`, Admin.deleteUser)
 
+    fastify.get(`/admin/getUserInfo`, Admin.getUserInfo)
+
+    fastify.post(`/admin/createRole`, Admin.createRole)
+
     next()
 }

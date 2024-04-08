@@ -1,8 +1,28 @@
 const bcrypt = require(`bcryptjs`)
 const { pool } = require('../../dependencies.js')
 const { randomUUID } = require(`crypto`)
+const userDto = require(`../../dtos/userDto.js`)
 require(`dotenv`).config()
+
+async function checkAdminStatus(id) {
+    const funcName = `checkAdminStatusFunction`
+    const client = await pool.connect()
+
+    try {
+        const User = await client.query(`SELECT * FROM users WHERE "userId" = $1`, [id])
+
+        return !(User.rows.length < 1 || User.rows[0].userRole !== `3`)
+    } catch(err) {
+        console.error(`${funcName}: Ошибка при проверке админ-статуса!`)
+        console.error(err)
+        return false
+    } finally {
+        client.release()
+    }
+}
+
 class Admin {
+
     async updateUser(request, reply) {
         const funcName = `AdminUpdateUserFunction`
         const client = await pool.connect()
@@ -10,9 +30,9 @@ class Admin {
         try {
             const { id, email, password, name, middleName, lastName, age, role, phone } = request.body
 
-            const adminCheck = await client.query(`SELECT * FROM users WHERE "userId" = $1`, [id])
+            const adminCheck = await checkAdminStatus(id)
 
-            if (adminCheck.rows[0].userRole !== `3`) {
+            if (!adminCheck) {
                 return reply.status(403).send({ message: `Нет доступа!` })
             }
 
@@ -54,18 +74,18 @@ class Admin {
         try {
             const { userEmail, userPassword, userPhone, userName, userAge, userMiddleName, userLastName, id, role } = request.body
 
-            const adminCheck = await client.query(`SELECT * FROM users WHERE "userId" = $1`, [id])
+            const adminCheck = await checkAdminStatus(id)
 
-            if (!adminCheck.rows[0]) {
-                return reply.status(404).send({ message: "Admin Not Found" })
-            }
-
-            if (adminCheck.rows[0].userRole !== `3`) {
+            if (!adminCheck) {
                 return reply.status(403).send({ message: `У вас нет доступа!` })
             }
 
             if (!userPassword || !userEmail || !userPhone || !userName || !userAge || !userMiddleName || !userLastName || !role) {
                 return reply.status(400).send({ message: `Вы не указали какие-то данные` })
+            }
+
+            if (role === -1) {
+                return reply.status(400).send({ message: "Недопустимая роль!" })
             }
 
             if (userPassword.length < 5) {
@@ -75,7 +95,7 @@ class Admin {
             const isUserFind = await client.query(`SELECT * FROM "users" where "userEmail" = $1`, [userEmail])
 
             if (isUserFind.rows[0]) {
-                return reply.status(400).send({ message: `Пользователь с такой почтой уже зарегестрирован!` })
+                return reply.status(409).send({ message: `Пользователь с такой почтой уже зарегестрирован!` })
             }
             const hashedPassword = await bcrypt.hash(userPassword, 5)
             const userInviteCode = randomUUID()
@@ -108,9 +128,9 @@ class Admin {
         try {
             const { id, email } = request.body
 
-            const adminCheck = await client.query(`SELECT * FROM users WHERE "userId" = $1`, [id])
+            const adminCheck = await checkAdminStatus(id)
 
-            if (adminCheck.rows[0].userRole !== `3`) {
+            if (!adminCheck) {
                 return reply.status(403).send({ message: `Нет доступа!` })
             }
 
@@ -132,6 +152,75 @@ class Admin {
             console.error(`${funcName} catch error`)
             console.error(err)
             return reply.status(500).send({ message: `Ошибка при удалении пользователя Админом: ${err}` })
+        } finally {
+            client.release()
+        }
+    }
+
+    async getUserInfo(request, reply) {
+        const funcName = `getUserInfoFromAdminFunction`
+        const client = await pool.connect()
+
+        try {
+            const id = request.body.id
+            const email = request.query.email
+
+            const adminCheck = await checkAdminStatus(id)
+
+            if(!adminCheck) {
+                return reply.status(403).send({ message: "Нет доступа!" })
+            }
+
+            if (!email) {
+                return reply.status(400).send({ message: "Вы не указали email!" })
+            }
+
+            const User = await client.query(`SELECT * FROM users WHERE "userEmail" = $1`, [email])
+
+            if (User.rows.length < 1) {
+                return reply.status(404).send({ message: "Пользователь не найден!" })
+            }
+
+            const UserBio = await client.query(`SELECT * FROM bio WHERE "userId" = $1`, [User.rows[0].userId])
+
+            const object = {User, UserBio}
+            const UserInfo = userDto(object)
+
+            console.log(`${funcName}: Получение данных о пользователе админом завершено!`)
+            return reply.status(200).send({ UserInfo })
+        } catch(err) {
+            console.error(`${funcName}: Ошибка при получении данных о пользователе Админом`)
+            console.error(err)
+            return reply.status(500).send({ message: `Ошибка при получении данных о пользователе Админом: ${err}` })
+        } finally {
+            client.release()
+        }
+    }
+
+    async createRole(request, reply) {
+        const funcName = `createRoleFromAdminFunction`
+        const client = await pool.connect()
+
+        try {
+            const {id, roleName} = request.body
+
+            const adminCheck = await checkAdminStatus(id)
+
+            if (!adminCheck) {
+                return reply.status(403).send({ message: "Нет доступа!" })
+            }
+
+            if (!roleName) {
+                return reply.status(400).send({ message: "Не указано название роли!" })
+            }
+
+            await client.query(`INSERT INTO roles("roleValue") VALUES($1)`, [roleName])
+
+            return reply.status(201).send({ message: `Роль ${roleName} успешно создана!` })
+        } catch(err) {
+            console.error(`${funcName}: Ошибка при создании роли Админом`)
+            console.error(err)
+            return reply.status(500).send({ message: `Произошла ошибка при создании роли Админом: ${err}` })
         } finally {
             client.release()
         }

@@ -1,9 +1,7 @@
 const bcrypt = require(`bcryptjs`)
 const { pool } = require('../../dependencies.js')
 const tokenService = require(`../../services/tokenService.js`)
-const { randomUUID } = require(`crypto`)
-const jwt = require(`jsonwebtoken`)
-const {jwtDecode} = require("jwt-decode");
+const userDto = require(`../../dtos/userDto.js`)
 require(`dotenv`).config()
 
 class Auth {
@@ -39,7 +37,7 @@ class Auth {
                 return reply.status(400).send({ message: `Неверное имя пользователя или пароль!` })
             }
 
-            const { accessToken, refreshToken } = tokenService(User.rows[0].userId)
+            const { accessToken, refreshToken } = tokenService.create(User.rows[0].userId)
 
             console.log(`${funcName}: Успешный вход пользователя`)
             return reply.status(200).send({ accessToken, refreshToken })
@@ -53,15 +51,26 @@ class Auth {
     }
 
     async me(request, reply) {
-        const id = request.body.id
+        const funcName = `getUserInfoFunction`
         const client = await pool.connect()
 
-        const User = await client.query(`SELECT * FROM users where "userId" = $1`, [id])
+        try {
+            const id = request.body.id
 
-        const UserInfo = User.rows[0]
-        client.release()
+            const User = await client.query(`SELECT * FROM users WHERE "userId" = $1`, [id])
+            const UserBio = await client.query(`SELECT * FROM bio WHERE "userId" = $1`, [id])
 
-        reply.send({ UserInfo })
+            const object = {User, UserBio}
+            const UserInfo = userDto(object)
+
+            return reply.status(200).send({ UserInfo })
+        } catch(err) {
+            console.error(`${funcName}: Ошибка при получении данных о пользователе`)
+            console.error(err)
+            return reply.status(500).send({ message: `Произошла ошибка при получении данных: ${err}` })
+        } finally {
+            client.release()
+        }
     }
 
     async refresh(request, reply) {
@@ -75,14 +84,18 @@ class Auth {
         try {
             const token = header.split(` `)[1]
 
-            jwt.verify(token, process.env.SUPER_SECRET_KEY)
+            if (!token) {
+                return reply.status(401).send({ message: "Не указан Refresh Token!" })
+            }
 
-            const decoded = jwtDecode(token)
+            const newTokens = tokenService.refresh(token)
 
-            const { accessToken, refreshToken } = tokenService(decoded.id)
+            if (newTokens === "Refresh Token Invalid") {
+                return reply.status(403).send({ message: "Refresh Token Invalid" })
+            }
 
             console.log(`${funcName}: Refresh токенов завершен!`)
-            return reply.status(200).send({ accessToken, refreshToken })
+            return reply.status(200).send(newTokens)
         } catch(err) {
             return reply.status(403).send({ message: `Refresh Token Invalid!` })
         }
