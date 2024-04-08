@@ -1,4 +1,4 @@
-const { createCourse,deleteCourse, getCourses,getCourse} = require('../../handlers/curse/handler');
+const { createCourse,deleteCourse, getCourses,getCourse, updateCourse} = require('../../handlers/curse/handler');
 
 module.exports = function (fastify, opts, next) {
 
@@ -52,6 +52,14 @@ module.exports = function (fastify, opts, next) {
         method: 'POST',
         async handler(request,reply){
             const data = await getCourse(request.body);
+            reply.status(data.statusCode)
+            reply.send(data.message)
+        }})
+    fastify.route({
+        url: '/updateCourse',
+        method: 'POST',
+        async handler(request,reply){
+            const data = await updateCourse(request.body);
             reply.status(data.statusCode)
             reply.send(data.message)
         }})
