@@ -35,7 +35,7 @@
       <v-combobox
         v-model="role"
         label="Роль"
-        :items="['Ученик', 'Учитель', 'Администратор']"
+        :items="this.items"
       ></v-combobox>
 
 
@@ -92,6 +92,7 @@
 import { ref } from 'vue';
 import axios from 'axios';
 
+document.title="Создание пользователя"
 export default{
   data() {
     return {
@@ -112,6 +113,17 @@ export default{
       ],
     }
   },
+  async mounted() {
+    const response = await axios.get(`http://192.168.1.104:3000/users/admin/getRoles`, {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMiLCJpYXQiOjE3MTI3NTM0NDIsImV4cCI6MTcxMjc1NTI0Mn0.XqSpf900OUHTUq34-xIWoJFtmV8_XAB5JtMI07yBZv4"
+      }
+    }).then((response) => {
+      this.roles = response.data.sendRoles
+      this.items = this.roles.map(role => role.roleValue)
+    })
+  },
   methods:{
     join(
       email,password,phone,middle,first,last,age,role
@@ -130,7 +142,7 @@ export default{
       axios.post("http://192.168.1.104:3000/users/admin/createUser",request,{
         headers:{
           "Content-Type":"application/json",
-          Authorization:"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMiLCJpYXQiOjE3MTI1ODA4NjAsImV4cCI6MTcxMjU4MjY2MH0.I0mBD_aS4PuDzQ_2uGatB8faoQbuiKld9s3hY_cSkpk"
+          Authorization:"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMiLCJpYXQiOjE3MTI3NTM0NDIsImV4cCI6MTcxMjc1NTI0Mn0.XqSpf900OUHTUq34-xIWoJFtmV8_XAB5JtMI07yBZv4"
         }
       })
 
@@ -147,7 +159,7 @@ export default{
       return re.test(myPhone);
     },
     getRole(role){
-      return (["Ученик","Учитель","Админ"].indexOf(role)+1)
+      return  this.roles.find(Vrole => Vrole.roleValue === role).roleId
     },
 
   }
