@@ -1,13 +1,146 @@
 <template>
   <h3 class="name">Статистика</h3>
-  <div class="variants">
-    <input id="info__body_1" class="info__switch" type="checkbox">
-    <label for="info__body_1" class="info__headline">активности пользователей</label>
-    <div class="info__body">
-      Вебинары образовательного проекта Level One — современный формат интеллектуального досуга, который будет интересен всем, кто хочет узнать что-то новое. Всего за пару часов вы совершите путешествие в увлекательный мир науки и искусства. Талантливые лекторы
-      поделятся своими знаниями, доступно расскажут о важных научных открытиях и расширят ваш кругозор.
-    </div>
-  </div>
+  <v-expansion-panels>
+    <v-expansion-panel>
+      <v-expansion-panel-title>
+        активности пользователей
+      </v-expansion-panel-title>
+
+      <v-expansion-panel-text>
+        <v-row
+          justify="center"
+          no-gutters
+        >
+          <span>Укажите период, за который нужно составить диаграмму</span>
+        </v-row>
+        <v-row
+          justify="center"
+          no-gutters
+        >
+          <v-col cols="5">
+            <v-text-field
+              label="С"
+              type="date"
+            ></v-text-field>
+            <v-text-field
+              label="По"
+              type="date"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+
+        <v-row
+          justify="center"
+          no-gutters
+        >
+          <span>Укажите курс, которому нужно составить диаграмму</span>
+        </v-row>
+
+        <v-col cols="12">
+          <v-combobox
+            :items="['Собака без ножек','Майнкрафт','Роблокс']"
+            density="comfortable"
+            label="Название курса"
+          ></v-combobox>
+        </v-col>
+      </v-expansion-panel-text>
+    </v-expansion-panel>
+
+    <v-expansion-panel>
+      <v-expansion-panel-title>
+        проведения занятий
+      </v-expansion-panel-title>
+
+      <v-expansion-panel-text>
+        <v-row
+          justify="center"
+          no-gutters
+        >
+          <span>Укажите период, за который нужно составить диаграмму</span>
+        </v-row>
+        <v-row
+          justify="center"
+          no-gutters
+        >
+          <v-col cols="5">
+            <v-text-field
+              label="С"
+              type="date"
+            ></v-text-field>
+            <v-text-field
+              label="По"
+              type="date"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+
+        <v-row
+          justify="center"
+          no-gutters
+        >
+          <span>Укажите курс, которому нужно составить диаграмму</span>
+        </v-row>
+
+        <v-col cols="12">
+          <v-combobox
+            :items="['Собака без ножек','Майнкрафт','Роблокс']"
+            density="comfortable"
+            label="Название курса"
+          ></v-combobox>
+        </v-col>
+      </v-expansion-panel-text>
+    </v-expansion-panel>
+
+    <v-expansion-panel>
+      <v-expansion-panel-title>
+        платежей
+      </v-expansion-panel-title>
+
+      <v-expansion-panel-text>
+        <v-row
+          justify="space-around"
+          no-gutters
+        >
+          <span>Укажите период, за который нужно составить диаграмму</span>
+        </v-row>
+        <v-row
+          justify="center"
+          no-gutters
+        >
+          <v-col cols="5">
+            <v-text-field
+                label="С"
+                type="date"
+            ></v-text-field>
+            <v-text-field
+                label="По"
+                type="date"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+
+        <v-row
+        justify="center"
+        no-gutters
+        >
+          <span>Укажите курс, которому нужно составить диаграмму</span>
+        </v-row>
+
+        <v-col cols="12">
+          <v-combobox
+            :items="['Собака без ножек','Майнкрафт','Роблокс']"
+            density="comfortable"
+            label="Название курса"
+          ></v-combobox>
+          <v-combobox
+            :items="[1,2]"
+            density="comfortable"
+            label="Часть курса"
+          ></v-combobox>
+        </v-col>
+      </v-expansion-panel-text>
+    </v-expansion-panel>
+  </v-expansion-panels>
 </template>
 
 <script setup>
@@ -17,58 +150,11 @@
 <style>
 
 .name{
+  margin-bottom: 20px;
   padding: 20px;
   border: 1px solid #ababab;
-  box-shadow: 0 0 5px rgba(0, 89, 68 , 60%);
   border-radius: 20px;
   font-style: italic;
 }
 
-.info__switch {
-  display: none;
-}
-
-.info__body {
-  max-height: 0;
-  overflow: hidden;
-  transition: 0.4s;
-}
-
-.info__switch:checked~.info__body {
-  max-height: 100px;
-  padding: 10px;
-  border: 1px solid darkgreen;
-  border-top: none;
-  border-radius: 10px;
-  border-top-right-radius: 0;
-  border-top-left-radius: 0;
-  position: absolute;
-}
-
-.info__headline {
-  display: flex;
-  position: relative;
-  margin-top: 15px;
-  padding: 15px;
-  border: 1px solid #e3e3e3;
-  border-radius: 10px;
-  transition: 0.4s;
-  user-select: none;
-  color: #000000;
-  background-color: #e3e3e3;
-  font-weight: normal;
-  cursor: pointer;
-}
-
-.info__switch:checked~.info__headline{
-  transition: 0.2s;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-}
-
-.info__headline:hover {
-  text-decoration: underline;
-  color: #3fa9ff;
-  background-color: #dadada;
-}
 </style>
