@@ -1,4 +1,5 @@
 require('dotenv').config();
+
 const autoload = require('@fastify/autoload');
 const path = require('path');
 const fastify = require('fastify')({

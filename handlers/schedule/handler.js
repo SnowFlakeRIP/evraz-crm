@@ -88,8 +88,8 @@ async function checkEventFromScheduleById(object) {
 
     try {
         const checkEventFromScheduleById = await client.query(`SELECT *
-                                                           FROM schedule
-                                                           WHERE "id" = $1`,
+                                                               FROM schedule
+                                                               WHERE "id" = $1`,
             [
                 object.eventId,
             ]
