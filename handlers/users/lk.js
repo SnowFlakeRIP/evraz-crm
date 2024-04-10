@@ -12,8 +12,8 @@ class Lk {
                 return reply.status(400).send({ message: `Вы не указали какие-то данные!` })
             }
 
-            await client.query(`UPDATE users SET "userPhone" = $1 WHERE "userId" = $2`, [phone, id])
-            await client.query(`UPDATE bio SET "bioName" = $1, "bioMiddleName" = $2, "bioLastName" = $3 WHERE "userId" = $4`, [name, middleName, lastName, id])
+            await client.query(`UPDATE users SET "userPhone" = $1 WHERE "userId" = $2`, ["" + phone + "", "" + id + ""])
+            await client.query(`UPDATE bio SET "bioName" = $1, "bioMiddleName" = $2, "bioLastName" = $3 WHERE "userId" = $4`, ["" + name + "", ""+ middleName + "", "" + lastName + "", "" + id + ""])
 
             console.log(`${funcName}: Успешное обновление пользователя!`)
             return reply.status(200).send({ message: `Пользователь успешно обновлен!` })
@@ -33,7 +33,7 @@ class Lk {
         try {
             const id = request.body.id
 
-            await client.query(`UPDATE users SET "userActive" = $1 WHERE "userId" = $2`, [false, id])
+            await client.query(`UPDATE users SET "userActive" = $1 WHERE "userId" = $2`, [false, "" + id + ""])
 
             console.log(`${funcName}: Успешная деактивация пользователя!`)
             return reply.status(200).send({ message: `Пользователь успешно деактивирован!` })

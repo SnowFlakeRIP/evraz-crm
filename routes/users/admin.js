@@ -11,5 +11,7 @@ module.exports = function (fastify, options, next) {
 
     fastify.post(`/admin/createRole`, Admin.createRole)
 
+    fastify.get(`/admin/getRoles`, Admin.getRoles)
+
     next()
 }

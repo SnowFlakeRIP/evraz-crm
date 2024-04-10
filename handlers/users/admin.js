@@ -9,7 +9,7 @@ async function checkAdminStatus(id) {
     const client = await pool.connect()
 
     try {
-        const User = await client.query(`SELECT * FROM users WHERE "userId" = $1`, [id])
+        const User = await client.query(`SELECT * FROM users WHERE "userId" = $1`, ["" + id + ""])
 
         return !(User.rows.length < 1 || User.rows[0].userRole !== `3`)
     } catch(err) {
@@ -30,9 +30,7 @@ class Admin {
         try {
             const { id, email, password, name, middleName, lastName, age, role, phone } = request.body
 
-            const adminCheck = await checkAdminStatus(id)
-
-            if (!adminCheck) {
+            if (!await checkAdminStatus(id)) {
                 return reply.status(403).send({ message: `Нет доступа!` })
             }
 
@@ -44,16 +42,20 @@ class Admin {
                 return reply.status(400).send({ message: `Короткий новый пароль!` })
             }
 
-            const UpdatedUser = await client.query(`SELECT * FROM users WHERE "userEmail" = $1`, [email])
+            const UpdatedUser = await client.query(`SELECT * FROM users WHERE "userEmail" = $1`, ["" + email + ""])
 
             if (UpdatedUser.rows.length < 1) {
                 return reply.status(404).send({ message: `Пользователь не найден!` })
             }
 
+            if (UpdatedUser.rows[0].userPhone === phone) {
+                return reply.status(409).send({ message: "Данный телефон уже занят!" })
+            }
+
             const hashPassword = await bcrypt.hash(password, 3)
 
-            await client.query(`UPDATE users SET "userPhone" = $1, "userEmail" = $2, "userRole" = $3, "userPassword" = $4 WHERE "userEmail" = $5 RETURNING "userId"`, [phone, email, role, hashPassword, email])
-            await client.query(`UPDATE bio SET "bioName" = $1, "bioMiddleName" = $2, "bioLastName" = $3 WHERE "userId" = $4`, [name, middleName, lastName, UpdatedUser.rows[0].userId])
+            await client.query(`UPDATE users SET "userPhone" = $1, "userEmail" = $2, "userRole" = $3, "userPassword" = $4 WHERE "userEmail" = $5 RETURNING "userId"`, ["" + phone + "", "" + email + "", "" + role + "", "" + hashPassword + "", "" + email + ""])
+            await client.query(`UPDATE bio SET "bioName" = $1, "bioMiddleName" = $2, "bioLastName" = $3 WHERE "userId" = $4`, ["" + name + "", "" + middleName + "", "" + lastName + "", UpdatedUser.rows[0].userId])
 
             console.log(`${funcName}: Успешное обновление пользователя администратором`)
             return reply.status(200).send({ message: `Пользователь успешно обновлен!` })
@@ -74,9 +76,7 @@ class Admin {
         try {
             const { userEmail, userPassword, userPhone, userName, userAge, userMiddleName, userLastName, id, role } = request.body
 
-            const adminCheck = await checkAdminStatus(id)
-
-            if (!adminCheck) {
+            if (!await checkAdminStatus(id)) {
                 return reply.status(403).send({ message: `У вас нет доступа!` })
             }
 
@@ -92,17 +92,17 @@ class Admin {
                 return reply.status(400).send({ message: `Слишком короткий пароль!` })
             }
 
-            const isUserFind = await client.query(`SELECT * FROM "users" where "userEmail" = $1`, [userEmail])
+            const isUserFind = await client.query(`SELECT * FROM "users" where "userEmail" = $1  OR "userPhone" = $2`, ["" + userEmail + "", "" + userPhone + ""])
 
             if (isUserFind.rows[0]) {
-                return reply.status(409).send({ message: `Пользователь с такой почтой уже зарегестрирован!` })
+                return reply.status(409).send({ message: `Пользователь с такой почтой или телефоном уже зарегестрирован!` })
             }
             const hashedPassword = await bcrypt.hash(userPassword, 5)
             const userInviteCode = randomUUID()
 
-            const createdId = await client.query(`INSERT INTO "users"("userEmail", "userPassword", "userPhone", "userTelegramChatId", "userActive", "userRole") VALUES($1, $2, $3, $4, $5, $6)  RETURNING "userId"`, [userEmail, hashedPassword, userPhone, `none`, true, role])
+            const createdId = await client.query(`INSERT INTO "users"("userEmail", "userPassword", "userPhone", "userTelegramChatId", "userActive", "userRole") VALUES($1, $2, $3, $4, $5, $6)  RETURNING "userId"`, ["" + userEmail + "", "" + hashedPassword + "", "" + userPhone + "", `none`, true, "" + role + ""])
 
-            await client.query(`INSERT INTO bio("userId", "bioName", "bioLastName", "bioMiddleName", "bioInviteCode") VALUES ($1, $2, $3, $4, $5)`, [createdId.rows[0].userId, userName, userLastName, userMiddleName, userInviteCode])
+            await client.query(`INSERT INTO bio("userId", "bioName", "bioLastName", "bioMiddleName", "bioInviteCode") VALUES ($1, $2, $3, $4, $5)`, [createdId.rows[0].userId, "" + userName + "", "" + userLastName + "", "" + userMiddleName + "", "" + userInviteCode + ""])
 
             if (!createdId) {
                 return reply.status(500).send({ message: `Произошла внутреняя ошибка при регистрации!` })
@@ -128,19 +128,17 @@ class Admin {
         try {
             const { id, email } = request.body
 
-            const adminCheck = await checkAdminStatus(id)
-
-            if (!adminCheck) {
+            if (!await checkAdminStatus(id)) {
                 return reply.status(403).send({ message: `Нет доступа!` })
             }
 
-            const userCheck = await client.query(`SELECT * FROM users WHERE "userEmail" = $1`, [email])
+            const userCheck = await client.query(`SELECT * FROM users WHERE "userEmail" = $1`, ["" + email + ""])
 
             if (userCheck.rows.length < 1) {
                 return reply.status(404).send({ message: `Пользователь не найден!` })
             }
 
-            const DeleteUserId = await client.query(`DELETE FROM users WHERE "userEmail" = $1 RETURNING "userId"`, [email])
+            const DeleteUserId = await client.query(`DELETE FROM users WHERE "userEmail" = $1 RETURNING "userId"`, ["" + email + ""])
             const realId = DeleteUserId.rows[0].userId
             await client.query(`DELETE FROM bio WHERE "userId" = $1`, [realId])
             await client.query(`DELETE FROM balance WHERE "userId" = $1`, [realId])
@@ -165,9 +163,7 @@ class Admin {
             const id = request.body.id
             const email = request.query.email
 
-            const adminCheck = await checkAdminStatus(id)
-
-            if(!adminCheck) {
+            if(!await checkAdminStatus(id)) {
                 return reply.status(403).send({ message: "Нет доступа!" })
             }
 
@@ -175,7 +171,7 @@ class Admin {
                 return reply.status(400).send({ message: "Вы не указали email!" })
             }
 
-            const User = await client.query(`SELECT * FROM users WHERE "userEmail" = $1`, [email])
+            const User = await client.query(`SELECT * FROM users WHERE "userEmail" = $1`, ["" + email + ""])
 
             if (User.rows.length < 1) {
                 return reply.status(404).send({ message: "Пользователь не найден!" })
@@ -204,9 +200,7 @@ class Admin {
         try {
             const {id, roleName} = request.body
 
-            const adminCheck = await checkAdminStatus(id)
-
-            if (!adminCheck) {
+            if (!await checkAdminStatus(id)) {
                 return reply.status(403).send({ message: "Нет доступа!" })
             }
 
@@ -214,13 +208,37 @@ class Admin {
                 return reply.status(400).send({ message: "Не указано название роли!" })
             }
 
-            await client.query(`INSERT INTO roles("roleValue") VALUES($1)`, [roleName])
+            await client.query(`INSERT INTO roles("roleValue") VALUES($1)`, ["" + roleName + ""])
 
             return reply.status(201).send({ message: `Роль ${roleName} успешно создана!` })
         } catch(err) {
             console.error(`${funcName}: Ошибка при создании роли Админом`)
             console.error(err)
             return reply.status(500).send({ message: `Произошла ошибка при создании роли Админом: ${err}` })
+        } finally {
+            client.release()
+        }
+    }
+
+    async getRoles(request, reply) {
+        const funcName = `getRolesToAdmin`
+        const client = await pool.connect()
+
+        try {
+            const id = request.body.id
+
+            if (!await checkAdminStatus(id)) {
+                return reply.status(403).send({ message: "Нет доступа!" })
+            }
+
+            const roles = await client.query(`SELECT * FROM roles`)
+            const sendRoles = roles.rows
+
+            return reply.status(200).send({ sendRoles })
+        } catch(err) {
+            console.error(`${funcName}: Ошибка при получении ролей Админом`)
+            console.error(err)
+            return reply.status(500).send({ message: `Произошла ошибка при получении ролей: ${err}` })
         } finally {
             client.release()
         }
