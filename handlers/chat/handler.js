@@ -25,12 +25,13 @@ async function createMessage(object) {
         //     return data
         // }
         // const password = await bcrypt.hashSync(object.userPassword, 10);
-        const createUser = await  client.query(`INSERT INTO message("userId","messageValue")
-                                               VALUES ($1, $2)
+        const createUser = await  client.query(`INSERT INTO message("userId","messageValue","fromuserid")
+                                               VALUES ($1, $2,$3)
                                                RETURNING "messageId"`,
             [
                 object.userId,
                 object.messageValue,
+                object.fromUserId
             ],
         );
         // if (checkUser.rows.length > 0) {
@@ -76,6 +77,7 @@ async function updateMessage(object){
         statusCode: 400,
         messageValue:[]
     };
+    console.log(object)
     const  funcName = 'updateMessage'
     const client = await pool.connect()
     try {

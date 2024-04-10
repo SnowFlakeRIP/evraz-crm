@@ -1,22 +1,26 @@
 <template>
-  <ul id="messages"></ul>
-  <form id="form" action="">
-    <input id="input" autocomplete="off" /><button>Send</button>
-  </form>
+  <input type="number" v-model="idish">
+  <button @click="reload">обновить</button>
+  <div
+    class="chat"
+    v-for="message in message"
+  >
+    <div>{{message.messageValue}}</div>
+  </div>
 </template>
 <style>
-body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
-#form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
-#input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
-#input:focus { outline: none; }
-#form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
-
-#messages { list-style-type: none; margin: 0; padding: 0; }
-#messages > li { padding: 0.5rem 1rem; }
-#messages > li:nth-child(odd) { background: #efefef; }
 </style>
 <script setup>
-  const socket = require('socket.io')
-  const socketo = socket.io();
+import axios from "axios";
+let idish = 1;
+let message = []
+let body={
+  userId:idish
+}
+async function reload(){
+  const response = await axios.post("/api/chat/update", body);
+  console.log(response.data)
+
+}
 </script>

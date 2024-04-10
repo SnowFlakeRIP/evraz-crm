@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+
+    <div id="chat"></div>
+    <script>
+        let xhr = new XMLHttpRequest();
+        let body={
+            userId:1
+        }
+        xhr.open('POST', 'http://127.0.0.1:8000/chat/update',true);
+        xhr.send(body)
+        xhr.onload=function () {
+            console.log(xhr.response.messageValue)
+        }
+    </script>
+</body>
+</html>

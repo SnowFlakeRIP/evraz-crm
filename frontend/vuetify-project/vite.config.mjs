@@ -63,5 +63,9 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    proxy: {
+      // string shorthand: http://localhost:5173/foo -> http://localhost:4567/foo
+      '/api': 'http://localhost:8000',
+    }
   },
 })

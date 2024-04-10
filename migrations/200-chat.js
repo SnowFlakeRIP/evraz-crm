@@ -9,6 +9,9 @@ exports.up = pgm => {
         userId:{
             type: `bigint`
         },
+        fromUserId:{
+            type: `bigint`,
+        },
         date: {
             type: `timestamp with time zone`,
             default: pgm.func(`now()`)

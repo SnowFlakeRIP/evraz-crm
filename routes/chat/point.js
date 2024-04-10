@@ -6,24 +6,28 @@ module.exports = function (fastify, opts, next) {
     fastify.route({
         url:    '/create',
         method: 'POST',
-        // schema: {
-        //     body: {
-        //         type:       'object',
-        //         properties: {
-        //             userId:     {
-        //                 type: 'bigint',
-        //             },
-        //             messageValue: {
-        //                 type: 'string',
-        //             },
-        //         },
-        //     },
-        // },
         async handler(request, reply) {
             const data = await createMessage(request.body);
             reply.status(data.statusCode)
             reply.send(data)
         },
+        wsHandler: (conn, req) => {
+            // WebSocket message
+            conn.socket.send('Hello Fastify WebSockets');
+        }
+    });
+    fastify.route({
+        method: 'GET',
+        url: '/hello',
+        handler: (req, reply) => {
+            // HTTP response
+            reply.send({ message: 'Hello Fastify' });
+        },
+        wsHandler: (conn, req) => {
+            // WebSocket message
+            console.log(conn)
+            conn.socket.send('Hello Fastify WebSockets');
+        }
     });
     fastify.route({
         url:    '/login',
