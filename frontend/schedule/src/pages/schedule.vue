@@ -1,24 +1,25 @@
 <template>
-  <div>
+  <div id="toolbar">
     <v-toolbar
       id="toolbar"
       border title
       color="white"
     >
-      <v-app-bar-nav-icon></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon @click="changeLeftMenuVisible"></v-app-bar-nav-icon>
 
-      <v-toolbar-title>Расписание</v-toolbar-title>
+      <v-toolbar-title>Schedule</v-toolbar-title>
 
       <v-spacer></v-spacer>
 
-      <!--      <v-select-->
-      <!--        v-model="type"-->
-      <!--        :items="types"-->
-      <!--        class="ma-2"-->
-      <!--        variant="outlined"-->
-      <!--        dense-->
-      <!--        hide-details-->
-      <!--      ></v-select>-->
+      <v-select
+        v-model="type"
+        :items="types"
+        class="ma-2"
+        variant="outlined"
+        dense
+        hide-details
+        density="compact"
+      ></v-select>
 
       <v-btn icon>
         <v-icon>mdi-magnify</v-icon>
@@ -27,28 +28,35 @@
   </div>
 
   <div id="main">
-    <div id="left-menu">
+    <div
+      id="left-menu"
+      v-show="leftMenuVisible"
+    >
       <v-btn
         rounded
         prepend-icon="mdi-plus"
         size="large"
       >
-        Добавить
+        Create
       </v-btn>
 
-      <v-date-picker show-adjacent-months></v-date-picker>
-      <div>Здесь будут сортировки</div>
+      <v-date-picker
+        show-adjacent-months
+        title='Enter date'
+      ></v-date-picker>
+
+      <div id="sorts">
+        <v-form>
+          <v-sheet width="300">
+          </v-sheet>
+        </v-form>
+      </div>
     </div>
 
-    <div>
-      <v-sheet
-        class="d-flex"
-        height="54"
-        tile
-      >
-      </v-sheet>
+    <div id="schedule">
       <v-sheet>
         <v-calendar
+          text="Today"
           ref="calendar"
           v-model="value"
           :events="events"
@@ -62,17 +70,20 @@
 
 <script>
 import { ref } from 'vue';
-
 import { useDate } from 'vuetify'
 
 export default {
   data: () => ({
     type: 'week',
-    types: ['day', 'week', 'month'],
-    weekday: [1, 2, 3, 4, 5, 6, 0],
+    types: [
+      { title: 'Day', value: 'day' },
+      { title: 'Week', value: 'week' },
+      { title: 'Month', value: 'month' },
+    ],
+    weekday: [0, 1, 2, 3, 4, 5, 6],
     weekdays: [
-      { title: 'Mon - Sun', value: [1, 2, 3, 4, 5, 6, 0] },
       { title: 'Sun - Sat', value: [0, 1, 2, 3, 4, 5, 6] },
+      { title: 'Mon - Sun', value: [1, 2, 3, 4, 5, 6, 0] },
       { title: 'Mon - Fri', value: [1, 2, 3, 4, 5] },
       { title: 'Mon, Wed, Fri', value: [1, 3, 5] },
     ],
@@ -113,11 +124,15 @@ export default {
 
       this.events = events
     },
-    getEventColor (event) {
+    getEventColor(event) {
       return event.color
     },
-    rnd (a, b) {
+    rnd(a, b) {
       return Math.floor((b - a + 1) * Math.random()) + a
+    },
+
+    changeLeftMenuVisible() {
+      this.leftMenuVisible = !this.leftMenuVisible;
     },
   },
 }
@@ -125,11 +140,20 @@ export default {
 
 <style>
 #main {
+  width: 100%;
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
 }
 
 #left-menu {
-  margin-top: 54px;
+  margin-top: 14px;
+  margin-left: 7px;
+}
+
+#schedule {
+  width: 100%;
+  margin-left: 7px;
+  margin-right: 7px;
 }
 </style>
