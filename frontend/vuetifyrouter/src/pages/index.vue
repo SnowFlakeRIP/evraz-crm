@@ -7,6 +7,7 @@
       hide-details="auto"
       label="Электронная почта/номер телефона"
     ></v-text-field>
+
       <v-text-field
       placeholder="Пароль"
       v-model="password" 
@@ -14,8 +15,11 @@
       :rules="rules"
       hide-details="auto"
       label="Пароль"
+      :append-icon="isPwd ? 'mdi-eye' : 'mdi-eye-off'"
+      @click:append="isPwd = !isPwd"
     ></v-text-field>
-      <v-btn>Войти</v-btn>
+
+      <v-btn @click="join">Войти</v-btn>
     </div>
   </div>
 </template>
@@ -30,40 +34,51 @@ export default{
           password:"",
           isPwd : ref(false),
           rules: [
-            value => !!value || 'Required.',
+            value => !!value || 'Обязательно',
             value => (value && value.length >= 3) || 'Min 3 characters',
         ],
       }
   },
   methods:{
-      join(){
+      async join(){
           let request = {
-              password:"test1",
-              phone:'etssetsetset'
+              email:"test",
+              password:"password",
           }
-          if(this.ValidMail(this.$data.login)){
-              request.email = this.$data.login
-          }else{
-              if(this.ValidPhone(this.$data.login)){
-                  request.phone = this.$data.login
-              }else{
-                  alert("Наверно указан телефон или электронная почта")
-                  return
-              }
+          if(this.$data.login.includes("'")||this.$data.password.includes("'")){
+            alert("Не надо делать махинации")
+            return
+          }
+          if(!(this.ValidMail(this.$data.login)||this.ValidPhone(this.$data.login))){
+              return
           }
           console.log(request)
-          let response = axios.post("http://192.168.1.104:3000/users/auth/login",request,{
+          await axios.post("http://192.168.1.104:3000/users/auth/login",request,{
               headers:{
                 "Content-type":"application/json"
               }
-          })
-          axios.get("http://192.168.1.104:3000/users/auth/refresh",{
-            headers:{
-                "Content-type":"application/json",
-                "Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJpYXQiOjE3MTE5NzEzMDgsImV4cCI6MTcxNDU2MzMwOH0.Y-hQRmypTT3CpKpF8_Jo2nkqFGHYEPrazymKcLhOhlo" 
-              },
+          }).then((res)=>{
+            console.log(res.data)
+            localStorage.accessToken = res.data.accessToken
+            localStorage.refreshToken = res.data.refreshToken
+
 
           })
+    //        await axios.put(`http://192.168.1.104:3000/users/admin/updateUser`,{
+    //         password:"Password",
+    //         phone:"12312321",
+    //         email:"screateEmail",
+    //         name:"updateName",
+    //         age:3,
+    //         middleName:"userMdlnm",
+    //         lastName:"userLastName",
+    //         role:2
+    //       },{
+    //   headers:{
+    //     "Content-Type":"application/json",
+    //     "Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMiLCJpYXQiOjE3MTI3NTA2MDQsImV4cCI6MTcxMjc1MjQwNH0.TcLlx2-apK4nGAJ69M8tEnrsr44t5YqtMieW3Zj_9e0"
+    //   }
+    // })
       },
       ValidMail(myMail) {
           const re = /^[\w-\.]+@[\w-]+\.[a-z]{2,4}$/i;
