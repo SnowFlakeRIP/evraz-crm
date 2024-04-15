@@ -42,6 +42,11 @@
             density="comfortable"
             label="Название курса"
           ></v-combobox>
+          <v-combobox
+            :items="[1,2]"
+            density="comfortable"
+            label="Часть курса"
+          ></v-combobox>
         </v-col>
       </v-expansion-panel-text>
     </v-expansion-panel>
@@ -86,6 +91,11 @@
             :items="['Собака без ножек','Майнкрафт','Роблокс']"
             density="comfortable"
             label="Название курса"
+          ></v-combobox>
+          <v-combobox
+            :items="[1,2]"
+            density="comfortable"
+            label="Часть курса"
           ></v-combobox>
         </v-col>
       </v-expansion-panel-text>
