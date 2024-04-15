@@ -22,16 +22,10 @@ module.exports = fp((fastify, options, next) => {
 
             const parsed = jwtDecode(token)
 
-            if (request.method === "GET") {
-                request.body = {}
-                request.body.id = parsed.id
-            }
-            else {
-                request.body.id = parsed.id
-            }
+            request.user = parsed.id
+
             next()
         } catch(err) {
-            console.error(err)
             return reply.status(403).send({ message: `Access Token Invalid` })
         }
     })

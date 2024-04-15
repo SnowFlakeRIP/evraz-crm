@@ -13,5 +13,7 @@ module.exports = function (fastify, options, next) {
 
     fastify.get(`/admin/getRoles`, Admin.getRoles)
 
+    fastify.get(`/admin/allUsers/:page`, Admin.allUsers)
+
     next()
 }

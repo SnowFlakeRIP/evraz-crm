@@ -55,7 +55,7 @@ class Auth {
         const client = await pool.connect()
 
         try {
-            const id = request.body.id
+            const id = request.user
 
             const User = await client.query(`SELECT * FROM users WHERE "userId" = $1`, ["" + id + ""])
             const UserBio = await client.query(`SELECT * FROM bio WHERE "userId" = $1`, ["" + id + ""])

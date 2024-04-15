@@ -28,7 +28,8 @@ class Admin {
         const client = await pool.connect()
 
         try {
-            const { id, email, password, name, middleName, lastName, age, role, phone } = request.body
+            const { email, password, name, middleName, lastName, age, role, phone } = request.body
+            const id = request.user
 
             if (!await checkAdminStatus(id)) {
                 return reply.status(403).send({ message: `Нет доступа!` })
@@ -74,7 +75,8 @@ class Admin {
         const client = await pool.connect()
 
         try {
-            const { userEmail, userPassword, userPhone, userName, userAge, userMiddleName, userLastName, id, role } = request.body
+            const { userEmail, userPassword, userPhone, userName, userAge, userMiddleName, userLastName, role } = request.body
+            const id = request.user
 
             if (!await checkAdminStatus(id)) {
                 return reply.status(403).send({ message: `У вас нет доступа!` })
@@ -126,7 +128,8 @@ class Admin {
         const client = await pool.connect()
 
         try {
-            const { id, email } = request.body
+            const { email } = request.body
+            const id = request.user
 
             if (!await checkAdminStatus(id)) {
                 return reply.status(403).send({ message: `Нет доступа!` })
@@ -160,7 +163,7 @@ class Admin {
         const client = await pool.connect()
 
         try {
-            const id = request.body.id
+            const id = request.user
             const email = request.query.email
 
             if(!await checkAdminStatus(id)) {
@@ -198,7 +201,8 @@ class Admin {
         const client = await pool.connect()
 
         try {
-            const {id, roleName} = request.body
+            const {roleName} = request.body
+            const id = request.user
 
             if (!await checkAdminStatus(id)) {
                 return reply.status(403).send({ message: "Нет доступа!" })
@@ -225,7 +229,7 @@ class Admin {
         const client = await pool.connect()
 
         try {
-            const id = request.body.id
+            const id = request.user
 
             if (!await checkAdminStatus(id)) {
                 return reply.status(403).send({ message: "Нет доступа!" })
@@ -239,6 +243,62 @@ class Admin {
             console.error(`${funcName}: Ошибка при получении ролей Админом`)
             console.error(err)
             return reply.status(500).send({ message: `Произошла ошибка при получении ролей: ${err}` })
+        } finally {
+            client.release()
+        }
+    }
+
+    async allUsers(request, reply) {
+        const funcName = `getAllUsersToAdmin`
+        const client = await pool.connect()
+
+        try {
+            const id = request.user
+            const needPage = request.params.page
+            let page = 1
+            const result = {
+                1: []
+            }
+
+            if (!await checkAdminStatus(id)) {
+                return reply.status(403).send({ message: "Нет доступа!" })
+            }
+
+            const Users = await client.query(`SELECT * FROM users`)
+            const Bio = await client.query(`SELECT * FROM bio`)
+
+            for (let i in Users.rows) {
+                const currentUser = Users.rows[i]
+                const currentBio = Bio.rows[i]
+                const object = {
+                    currentUser, currentBio
+                }
+
+                if (result[page].length < 10) {
+                    result[page].push(object)
+                }
+                else {
+                    page += 1
+                    result[page] = [object]
+                }
+            }
+
+            const sendResult = result[needPage]
+            const totalPages = Object.keys(result).length
+
+            if (needPage === ``) {
+                return reply.status(200).send({ result, totalPages })
+            }
+
+            if (!sendResult) {
+                return reply.status(404).send({ message: "Количество пользоваетелей меньше чем указанный запрос" })
+            }
+
+            return reply.status(200).send({ sendResult, totalPages })
+        } catch(err) {
+            console.error(`${funcName}:  Ошибка при получении всех юзеров Админом`)
+            console.error(err)
+            return reply.status(500).send({ message: `Ошибка при получении данных админом: ${err}` })
         } finally {
             client.release()
         }
