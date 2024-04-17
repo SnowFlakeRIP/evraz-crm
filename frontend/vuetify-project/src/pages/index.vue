@@ -3,7 +3,7 @@
   <button @click="reload">обновить</button>
   <div
     class="chat"
-    v-for="message in message"
+    v-for="(messageind,message) in message"
   >
     <div>{{message.messageValue}}</div>
   </div>
@@ -14,12 +14,13 @@
 <script setup>
 import axios from "axios";
 let idish = 1;
-let message = []
+let message = ref([])
 let body={
   userId:idish
 }
 async function reload(){
   const response = await axios.post("/api/chat/update", body);
+  message.value=response.data.messageValue;
   console.log(response.data)
 
 }
