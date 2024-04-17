@@ -28,7 +28,7 @@ class Admin {
         const client = await pool.connect()
 
         try {
-            const { email, password, name, middleName, lastName, age, role, phone } = request.body
+            const { email, password, name, middleName, lastName, age, role, phone, tgId } = request.body
             const id = request.user
 
             if (!await checkAdminStatus(id)) {
@@ -55,8 +55,8 @@ class Admin {
 
             const hashPassword = await bcrypt.hash(password, 3)
 
-            await client.query(`UPDATE users SET "userPhone" = $1, "userEmail" = $2, "userRole" = $3, "userPassword" = $4 WHERE "userEmail" = $5 RETURNING "userId"`, ["" + phone + "", "" + email + "", "" + role + "", "" + hashPassword + "", "" + email + ""])
-            await client.query(`UPDATE bio SET "bioName" = $1, "bioMiddleName" = $2, "bioLastName" = $3 WHERE "userId" = $4`, ["" + name + "", "" + middleName + "", "" + lastName + "", UpdatedUser.rows[0].userId])
+            await client.query(`UPDATE users SET "userPhone" = $1, "userEmail" = $2, "userRole" = $3, "userPassword" = $4, "updatedAt" = $6, "userTelegramChatId" = $7 WHERE "userEmail" = $5  RETURNING "userId"`, ["" + phone + "", "" + email + "", "" + role + "", "" + hashPassword + "", "" + email + "", new Date(), "" + tgId + ""])
+            await client.query(`UPDATE bio SET "bioName" = $1, "bioMiddleName" = $2, "bioLastName" = $3, "updatedAt" = $5, "bioAge" = $6 WHERE "userId" = $4`, ["" + name + "", "" + middleName + "", "" + lastName + "", UpdatedUser.rows[0].userId, new Date(), "" + age + ""])
 
             console.log(`${funcName}: Успешное обновление пользователя администратором`)
             return reply.status(200).send({ message: `Пользователь успешно обновлен!` })
@@ -75,7 +75,7 @@ class Admin {
         const client = await pool.connect()
 
         try {
-            const { userEmail, userPassword, userPhone, userName, userAge, userMiddleName, userLastName, role } = request.body
+            const { userEmail, userPassword, userPhone, userName, userAge, userMiddleName, userLastName, role, tgId } = request.body
             const id = request.user
 
             if (!await checkAdminStatus(id)) {
@@ -102,9 +102,9 @@ class Admin {
             const hashedPassword = await bcrypt.hash(userPassword, 5)
             const userInviteCode = randomUUID()
 
-            const createdId = await client.query(`INSERT INTO "users"("userEmail", "userPassword", "userPhone", "userTelegramChatId", "userActive", "userRole") VALUES($1, $2, $3, $4, $5, $6)  RETURNING "userId"`, ["" + userEmail + "", "" + hashedPassword + "", "" + userPhone + "", `none`, true, "" + role + ""])
+            const createdId = await client.query(`INSERT INTO "users"("userEmail", "userPassword", "userPhone", "userTelegramChatId", "userActive", "userRole") VALUES($1, $2, $3, $4, $5, $6)  RETURNING "userId"`, ["" + userEmail + "", "" + hashedPassword + "", "" + userPhone + "", "" + tgId + "" , true, "" + role + ""])
 
-            await client.query(`INSERT INTO bio("userId", "bioName", "bioLastName", "bioMiddleName", "bioInviteCode") VALUES ($1, $2, $3, $4, $5)`, [createdId.rows[0].userId, "" + userName + "", "" + userLastName + "", "" + userMiddleName + "", "" + userInviteCode + ""])
+            await client.query(`INSERT INTO bio("userId", "bioName", "bioLastName", "bioMiddleName", "bioInviteCode", "bioAge") VALUES ($1, $2, $3, $4, $5, $6)`, [createdId.rows[0].userId, "" + userName + "", "" + userLastName + "", "" + userMiddleName + "", "" + userInviteCode + "", "" + userAge + ""])
 
             if (!createdId) {
                 return reply.status(500).send({ message: `Произошла внутреняя ошибка при регистрации!` })

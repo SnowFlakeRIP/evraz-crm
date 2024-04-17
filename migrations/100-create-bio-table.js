@@ -28,6 +28,10 @@ exports.up = pgm => {
             type: `varchar(150)`,
         },
 
+        bioAge: {
+            type: `bigint`
+        },
+
         bioInviteCodeStartDate: {
             type: `timestamp with time zone`,
             default: pgm.func(`now()`),
