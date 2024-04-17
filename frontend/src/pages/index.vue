@@ -8,8 +8,8 @@
     </v-toolbar>
     <v-main style="display: flex; flex-direction: row; height: calc(100vh - 64px); padding-bottom: 0">
       <div id="options" style="padding: 4px 0">
-        <v-btn>Добавить занятие</v-btn>
-        <v-date-picker show-adjacent-months hide-header min="2023-01-01" max="2024-12-31"></v-date-picker>
+        <v-btn variant="outlined">Добавить занятие</v-btn>
+        <v-date-picker show-adjacent-months hide-header min="2023-01-01" max="2024-12-31" v-model="value"></v-date-picker>
         <v-card>Сортировки</v-card>
       </div>
 <!--      <div id="calendar" style="flex: 1; overflow-y: scroll">-->
@@ -49,6 +49,8 @@
             :events="events"
             view-mode="week"
             :weekdays="weekday"
+            min="2023-01-01"
+            max="2024-12-31"
           ></v-calendar>
         </v-sheet>
       </div>
@@ -63,27 +65,26 @@
 </style>
 
 <script setup>
-import { ref } from 'vue'
 
-const drawer = ref(null)
 </script>
 
 <script>
 
-import { useDate } from 'vuetify'
+import {computed, ref} from 'vue';
+import {useDate} from "vuetify";
 
 export default {
   data: () => ({
-    type: 'month',
+    type: 'day',
     types: ['month', 'week', 'day'],
-    weekday: [0, 1, 2, 3, 4, 5, 6],
+    weekday: [1, 2, 3, 4, 5, 6],
     weekdays: [
       { title: 'Sun - Sat', value: [0, 1, 2, 3, 4, 5, 6] },
       { title: 'Mon - Sun', value: [1, 2, 3, 4, 5, 6, 0] },
       { title: 'Mon - Fri', value: [1, 2, 3, 4, 5] },
       { title: 'Mon, Wed, Fri', value: [1, 3, 5] },
     ],
-    value: [new Date()],
+    value: ref([new Date()]),
     events: [],
     colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
     titles: ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party'],
@@ -91,6 +92,9 @@ export default {
   mounted () {
     const adapter = useDate()
     this.getEvents({ start: adapter.startOfDay(adapter.startOfMonth(new Date())), end: adapter.endOfDay(adapter.endOfMonth(new Date())) })
+  },
+  computed: {
+
   },
   methods: {
     getEvents ({ start, end }) {
