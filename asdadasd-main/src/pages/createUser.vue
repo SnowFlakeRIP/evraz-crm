@@ -14,6 +14,14 @@
       ></v-text-field>
 
       <v-text-field
+        v-model="tgId"
+        color="primary"
+        label="Telegram Id"
+        variant="underlined"
+        :rules="rules"
+      ></v-text-field>
+
+      <v-text-field
         placeholder="Пароль"
         v-model="password"
         :type="isPwd ? 'text' : 'password'"
@@ -96,17 +104,18 @@ document.title="Создание пользователя"
 export default{
   data() {
     return {
-      login: "",
+      email: "",
+      tgId:"",
       password: "",
-      email:"",
-      phone:"",
-      middle:"",
-      first:"",
-      last:"",
-      age:"",
-      role:"",
-
-      isPwd: ref(false),
+      phone: "",
+      middle: "",
+      first: "",
+      last: "",
+      age: "",
+      role: "",
+      roles: [],
+      items: [],
+      isPwd: false, // Исправлено на простое значение
       rules: [
         value => !!value || 'Обязательно',
         value => (value && value.length >= 2) || 'Min 2 characters',
@@ -114,42 +123,84 @@ export default{
     }
   },
   async mounted() {
-    const response = await axios.get(`http://192.168.1.104:3000/users/admin/getRoles`, {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMiLCJpYXQiOjE3MTI3NTM0NDIsImV4cCI6MTcxMjc1NTI0Mn0.XqSpf900OUHTUq34-xIWoJFtmV8_XAB5JtMI07yBZv4"
-      }
-    }).then((response) => {
-      this.roles = response.data.sendRoles
-      this.items = this.roles.map(role => role.roleValue)
-    })
+    const response = await this.requester('http://192.168.1.104:3000/users/admin/getRoles','GET',null)
+    console.log(response)
+    this.roles = response.sendRoles
+    this.items = this.roles.map(role=>role.roleValue)
+    console.log(this.items)
+    return{
+      items:this.items,
+    }
   },
   methods:{
-    join(
-      email,password,phone,middle,first,last,age,role
-    ){
-      const numberRole=this.getRole(this.$data.role)
-      const request = {
-        userEmail: this.$data.email,
-        userPassword: this.$data.password,
-        userPhone: this.$data.phone,
-        userMiddleName: this.$data.middle,
-        userName: this.$data.first,
-        userLastName: this.$data.last,
-        userAge: this.$data.age,
-        role: numberRole,
+    async requestParser(request){
+      const response = request.data
+
+      return response
+    },
+
+    async requester(url,method, body){
+      switch(method){
+        case "GET":
+          try{
+            const request = await axios.get(url,{
+              headers:{
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+              }
+            })
+            return await this.requestParser(request)
+          }catch(e){
+            if (e.response.data.message === 'Access Token Invalid'){
+              this.refresh()
+              break
+            }
+          }
       }
-      axios.post("http://192.168.1.104:3000/users/admin/createUser",request,{
+    },
+    join() {
+      try {
+        const numberRole = this.getRole(this.$data.role)
+        const request = {
+            userEmail: this.$data.email,
+            tgId: this.$data.tgId,
+            userPassword: this.$data.password,
+            userPhone: this.$data.phone,
+            userMiddleName: this.$data.middle,
+            userName: this.$data.first,
+            userLastName: this.$data.last,
+            userAge: this.$data.age,
+            role: numberRole,
+          }
+
+          axios.post("http://192.168.1.104:3000/users/admin/createUser", request, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer "+localStorage.accessToken
+          }
+        })
+      }catch(e) {
+        if (e.response.data.message == "Access Token Invalid") {
+          this.refresh()
+        } else {
+          alert("Произошла ошибка", e.message)
+        }
+      }
+    },
+
+    async refresh(){
+
+      const res = await axios.get("http://192.168.1.104:3000/users/auth/refresh",{
         headers:{
           "Content-Type":"application/json",
-          Authorization:"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMiLCJpYXQiOjE3MTI3NTM0NDIsImV4cCI6MTcxMjc1NTI0Mn0.XqSpf900OUHTUq34-xIWoJFtmV8_XAB5JtMI07yBZv4"
+          "Authorization":"Bearer "+localStorage.refreshToken
         }
       })
 
-
-
-      },
-
+      localStorage.accessToken = res.data.accessToken
+      localStorage.refreshToken = res.data.refreshToken
+      this.join()
+    },
     ValidMail(myMail) {
       const re = /^[\w-\.]+@[\w-]+\.[a-z]{2,4}$/i;
       return  re.test(myMail);
@@ -189,7 +240,7 @@ export default{
 }
 input, .v-field__field{
   width: 30vw;
-  height: 8.45vh;
+  height: 7.5vh;
   transition-delay: 15ms;
 }
 button{
