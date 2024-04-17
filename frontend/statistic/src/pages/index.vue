@@ -48,6 +48,9 @@
             label="Часть курса"
           ></v-combobox>
         </v-col>
+        <div class="parentButton">
+          <button @click="diagramm" class="button">Создать диаграмму</button>
+        </div>
       </v-expansion-panel-text>
     </v-expansion-panel>
 
@@ -154,7 +157,6 @@
 </template>
 
 <script setup>
-
 </script>
 
 <style>
@@ -165,6 +167,19 @@
   border: 1px solid #ababab;
   border-radius: 20px;
   font-style: italic;
+}
+
+.parentButton{
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.button{
+  border: 1px solid #131313;
+  border-radius: 7px;
+  padding: 8px;
+  background-color: #e2efe2;
 }
 
 </style>
