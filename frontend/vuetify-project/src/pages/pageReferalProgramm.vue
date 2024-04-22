@@ -5,6 +5,7 @@ export default {
     overlay: false,
     snackbar: false,
     timeout: 1000,
+    title:'реферальная программа',
   }),
   methods: {
     copyText(){
@@ -39,15 +40,15 @@ export default {
   </div>
   <div class="refer">
     <div class="pod">
-      <div class="number">1</div>
+      <div class="number font-weight-black">1</div>
       <div>Поделитесь ссылкой с друзьями удобным способом</div>
     </div>
     <div class="reg">
-      <div class="number">2</div>
+      <div class="number font-weight-black">2</div>
       <div>Друзья регистрируются по вашей ссылке</div>
     </div>
     <div class="bon">
-      <div class="number">3</div>
+      <div class="number font-weight-black">3</div>
       <div>Вы получаете бонусы</div>
     </div>
   </div>
@@ -156,5 +157,6 @@ export default {
   font-size: 2em;
   margin-top:60px;
   margin-bottom:30px;
+
 }
 </style>
