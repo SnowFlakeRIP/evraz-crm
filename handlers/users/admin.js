@@ -35,12 +35,8 @@ class Admin {
                 return reply.status(403).send({ message: `Нет доступа!` })
             }
 
-            if (!email || !password || !name || !middleName || !lastName || !age || !role || !phone) {
+            if (!email || !name || !middleName || !lastName || !age || !role || !phone) {
                 return reply.status(400).send({ message: `Вы не указали какие-то данные!` })
-            }
-
-            if (password.length < 5) {
-                return reply.status(400).send({ message: `Короткий новый пароль!` })
             }
 
             const UpdatedUser = await client.query(`SELECT * FROM users WHERE "userEmail" = $1`, ["" + email + ""])
@@ -49,13 +45,20 @@ class Admin {
                 return reply.status(404).send({ message: `Пользователь не найден!` })
             }
 
-            if (UpdatedUser.rows[0].userPhone === phone) {
-                return reply.status(409).send({ message: "Данный телефон уже занят!" })
+            const PhoneCheck = await client.query(`SELECT * FROM users WHERE "userPhone" = $1`, ["" + phone + ""])
+
+            if (PhoneCheck.rows[0] && PhoneCheck.rows[0]?.userPhone !== UpdatedUser.rows[0].userPhone) {
+                 return reply.status(409).send({ message: "Данный телефон уже занят!" })
             }
 
-            const hashPassword = await bcrypt.hash(password, 3)
+            await client.query(`UPDATE users SET "userPhone" = $1, "userEmail" = $2, "userRole" = $3, "updatedAt" = $5, "userTelegramChatId" = $6 WHERE "userEmail" = $4  RETURNING "userId"`, ["" + phone + "", "" + email + "", "" + role + "", "" + email + "", new Date(), "" + tgId + ""])
 
-            await client.query(`UPDATE users SET "userPhone" = $1, "userEmail" = $2, "userRole" = $3, "userPassword" = $4, "updatedAt" = $6, "userTelegramChatId" = $7 WHERE "userEmail" = $5  RETURNING "userId"`, ["" + phone + "", "" + email + "", "" + role + "", "" + hashPassword + "", "" + email + "", new Date(), "" + tgId + ""])
+            if (password) {
+                const hashPassword = await bcrypt.hash(password, 3)
+
+                await client.query(`UPDATE users SET "userPassword" = $1 WHERE "userEmail" = $2`, ["" + hashPassword + "", "" + email + ""])
+            }
+
             await client.query(`UPDATE bio SET "bioName" = $1, "bioMiddleName" = $2, "bioLastName" = $3, "updatedAt" = $5, "bioAge" = $6 WHERE "userId" = $4`, ["" + name + "", "" + middleName + "", "" + lastName + "", UpdatedUser.rows[0].userId, new Date(), "" + age + ""])
 
             console.log(`${funcName}: Успешное обновление пользователя администратором`)
