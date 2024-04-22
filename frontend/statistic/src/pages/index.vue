@@ -1,31 +1,35 @@
 <template>
   <h3 class="name">Статистика</h3>
-  <v-expansion-panels>
-    <v-expansion-panel>
-      <v-expansion-panel-title>
-        активности пользователей
-      </v-expansion-panel-title>
 
-      <v-expansion-panel-text>
-        <v-row
-          justify="center"
-          no-gutters
-        >
-          <span>Укажите период, за который нужно составить диаграмму</span>
-        </v-row>
-        <v-row
-          justify="center"
-          no-gutters
-        >
-          <v-col cols="5">
-            <v-text-field
-              label="С"
-              type="date"
-            ></v-text-field>
-            <v-text-field
-              label="По"
-              type="date"
-            ></v-text-field>
+  <v-tabs
+    v-model="tab"
+    bg-color="primary"
+  >
+    <v-tab value="users">Пользователи</v-tab>
+    <v-tab value="lessons">Занятия</v-tab>
+    <v-tab value="payments">Платежи</v-tab>
+  </v-tabs>
+
+  <v-card-text>
+    <v-window v-model="tab">
+      <v-window-item value="users">
+        <v-row>
+          <v-col cols="3">
+            <v-row no-gutters>
+              <v-col cols="12">Укажите период</v-col>
+              <v-col cols="5" class="ma-2">
+                <v-text-field
+                  label="С"
+                  type="date"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="5" class="ma-2">
+                <v-text-field
+                  label="По"
+                  type="date"
+                ></v-text-field>
+              </v-col>
+            </v-row>
           </v-col>
         </v-row>
 
@@ -49,114 +53,29 @@
           ></v-combobox>
         </v-col>
         <div class="parentButton">
-          <button @click="diagramm" class="button">Создать диаграмму</button>
+          <button @click="diagram" class="button">Создать диаграмму</button>
         </div>
-      </v-expansion-panel-text>
-    </v-expansion-panel>
+      </v-window-item>
 
-    <v-expansion-panel>
-      <v-expansion-panel-title>
-        проведения занятий
-      </v-expansion-panel-title>
+      <v-window-item value="lessons">
+        Two
+      </v-window-item>
 
-      <v-expansion-panel-text>
-        <v-row
-          justify="center"
-          no-gutters
-        >
-          <span>Укажите период, за который нужно составить диаграмму</span>
-        </v-row>
-        <v-row
-          justify="center"
-          no-gutters
-        >
-          <v-col cols="5">
-            <v-text-field
-              label="С"
-              type="date"
-            ></v-text-field>
-            <v-text-field
-              label="По"
-              type="date"
-            ></v-text-field>
-          </v-col>
-        </v-row>
-
-        <v-row
-          justify="center"
-          no-gutters
-        >
-          <span>Укажите курс, которому нужно составить диаграмму</span>
-        </v-row>
-
-        <v-col cols="12">
-          <v-combobox
-            :items="['Собака без ножек','Майнкрафт','Роблокс']"
-            density="comfortable"
-            label="Название курса"
-          ></v-combobox>
-          <v-combobox
-            :items="[1,2]"
-            density="comfortable"
-            label="Часть курса"
-          ></v-combobox>
-        </v-col>
-      </v-expansion-panel-text>
-    </v-expansion-panel>
-
-    <v-expansion-panel>
-      <v-expansion-panel-title>
-        платежей
-      </v-expansion-panel-title>
-
-      <v-expansion-panel-text>
-        <v-row
-          justify="space-around"
-          no-gutters
-        >
-          <span>Укажите период, за который нужно составить диаграмму</span>
-        </v-row>
-        <v-row
-          justify="center"
-          no-gutters
-        >
-          <v-col cols="5">
-            <v-text-field
-                label="С"
-                type="date"
-            ></v-text-field>
-            <v-text-field
-                label="По"
-                type="date"
-            ></v-text-field>
-          </v-col>
-        </v-row>
-
-        <v-row
-        justify="center"
-        no-gutters
-        >
-          <span>Укажите курс, которому нужно составить диаграмму</span>
-        </v-row>
-
-        <v-col cols="12">
-          <v-combobox
-            :items="['Собака без ножек','Майнкрафт','Роблокс']"
-            density="comfortable"
-            label="Название курса"
-          ></v-combobox>
-          <v-combobox
-            :items="[1,2]"
-            density="comfortable"
-            label="Часть курса"
-          ></v-combobox>
-        </v-col>
-      </v-expansion-panel-text>
-    </v-expansion-panel>
-  </v-expansion-panels>
+      <v-window-item value="payments">
+        Three
+      </v-window-item>
+    </v-window>
+  </v-card-text>
 </template>
 
 <script setup>
+import {ref} from "vue";
+
+const tab = ref('users');
+
+function diagram(){
+
+}
 </script>
 
 <style>
