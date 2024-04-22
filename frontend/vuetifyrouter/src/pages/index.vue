@@ -42,7 +42,8 @@ export default{
   methods:{
       async join(){
           let request = {
-              email:"test",
+              phone:"89025493433",
+              //email:"saksgs",
               password:"password",
           }
           if(this.$data.login.includes("'")||this.$data.password.includes("'")){
@@ -64,21 +65,22 @@ export default{
 
 
           })
-    //        await axios.put(`http://192.168.1.104:3000/users/admin/updateUser`,{
-    //         password:"Password",
-    //         phone:"12312321",
-    //         email:"screateEmail",
-    //         name:"updateName",
-    //         age:3,
-    //         middleName:"userMdlnm",
-    //         lastName:"userLastName",
-    //         role:2
-    //       },{
-    //   headers:{
-    //     "Content-Type":"application/json",
-    //     "Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjMiLCJpYXQiOjE3MTI3NTA2MDQsImV4cCI6MTcxMjc1MjQwNH0.TcLlx2-apK4nGAJ69M8tEnrsr44t5YqtMieW3Zj_9e0"
-    //   }
-    // })
+          let data = {
+            middleName:"newName",
+            name:"name",
+            phone:"+9999989",
+            password :"password",
+            age:2,
+            lastName:'newLastName',
+            role:3,
+            email:"test"
+          }
+          await axios.put(`http://192.168.1.104:3000/users/admin/updateUser`,data,{
+            headers:{
+              "Content-Type":"application/json",
+              "Authorization":"Bearer "+localStorage.accessToken
+              }
+            })
       },
       ValidMail(myMail) {
           const re = /^[\w-\.]+@[\w-]+\.[a-z]{2,4}$/i;

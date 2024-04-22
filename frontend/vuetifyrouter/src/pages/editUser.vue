@@ -127,8 +127,12 @@ export default{
 
         })
         console.log(this.getRole("Новая роль"))
-         }catch{
-          this.refresh()
+         }catch(e){
+          if(e.response.data.message == "Access Token Invalid"){
+            this.refresh()
+          }else{
+            alert("Произошла ошибка",e.message)
+          }
          }
     },
 
