@@ -8,7 +8,7 @@
     </v-toolbar>
     <v-main style="display: flex; flex-direction: row; height: calc(100vh - 64px); padding-bottom: 0">
       <div id="options" style="padding: 8px; display: flex; flex-direction: column; gap: 8px;">
-        <v-dialog max-width="500">
+        <v-dialog max-width="600">
           <template v-slot:activator="{ props: activatorProps }">
             <v-btn
               v-bind="activatorProps"
@@ -20,8 +20,17 @@
           <template v-slot:default="{ isActive }">
             <v-card title="Добавить занятие">
               <v-text-field label="Название" required :model-value="name"></v-text-field>
-              <v-text-field label="Начало" required></v-text-field>
-              <v-text-field label="Конец" required></v-text-field>
+              <div style="display: flex; justify-content: space-evenly;">
+                <div style="display: grid">
+                  <span>Начало</span>
+                  <DatePicker mode="dateTime" is24hr v-model="start"></DatePicker>
+                </div>
+                <div style="display: grid">
+                  <span>Конец</span>
+                  <DatePicker mode="dateTime" is24hr v-model="end"></DatePicker>
+                </div>
+              </div>
+
               <v-text-field label="ХЗ" required></v-text-field>
               <v-card-actions>
                 <v-spacer></v-spacer>
@@ -65,9 +74,14 @@ import {
   viewMonthAgenda,
 } from '@schedule-x/calendar'
 import '@schedule-x/theme-default/dist/index.css'
+import { Calendar, DatePicker } from 'v-calendar';
+import 'v-calendar/style.css';
+
 
 let name = ref("jkfjks")
 let value = ref(new Date())
+let start = ref(new Date())
+let end = ref(new Date(start.value.valueOf()+3600000))
 const calendarApp = createCalendar({
   selectedDate: '2024-04-17',
   locale: "ru-RU",
