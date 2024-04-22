@@ -1,10 +1,28 @@
-<script >
-export default {
-  data: () => ({
-    rules: {
-      required: value => !!value || 'Заполните поле',
-    },
-  }),
+<script setup>
+import { ref } from 'vue';
+
+let name = ref('')
+let description = ref('');
+let numberOfHours = ref(null)
+let schedule = ref('')
+let rules = ref({
+    required: value => !!value || 'Заполните поле',
+})
+
+let courses = ref([{
+  name:'rrrrrrrrrrr',
+  description:'ffhf',
+  numberOfHours: 3
+}])
+
+function addCourse() {
+  let course = {
+    name: name.value,
+    description: description.value,
+    numberOfHours:numberOfHours.value,
+    schedule:schedule.value
+  }
+  courses.value.push(course)
 }
 </script>
 
@@ -68,12 +86,22 @@ export default {
             class="block"
             :rules="[rules.required]"
             hide-details="auto"
-            label="Название"
+            label="Кол-во часов в занятии"
             variant="outlined"
             type="number"
 
           ></v-text-field>
 
+        </v-responsive>
+      </div>
+      <div>
+        <v-responsive
+          class="mx-auto"
+          max-width="344"
+        >
+          <v-btn @click="addCourse" variant="outlined">
+            Добавить курс
+          </v-btn>
         </v-responsive>
       </div>
     </div>

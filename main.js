@@ -6,6 +6,9 @@ const fastify = require('fastify')({
 });
 fastify.register(autoload, {
     dir: path.join(__dirname, './routes'),
+    options: {
+        prefix: '/api',
+    }
 });
 
 const start = async () => {
