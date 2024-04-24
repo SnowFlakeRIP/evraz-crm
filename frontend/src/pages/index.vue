@@ -33,6 +33,7 @@
                   variant="outlined"
                   v-model="selGroup"
                 ></v-select>
+                <v-text-field label="Название" variant="outlined" v-model="name"></v-text-field>
                 <div style="display: flex; justify-content: space-between;">
                   <div style="display: grid">
                     <span>Начало</span>
@@ -65,15 +66,44 @@
             </v-card>
           </template>
         </v-dialog>
-        <v-card>Сортировки</v-card>
+        <v-card class="pa-4">
+          <v-select
+            label="Курс"
+            :items="([{title: 'Любой', value: ''}]).concat(courses.map(c => c.name))"
+            variant="outlined"
+            v-model="filter.course"
+            @update:modelValue="filter.group = ''; updateEvents()"
+            :hide-details="filter.course === ''"
+          ></v-select>
+          <v-select
+            label="Группа"
+            :items="([{title: 'Любая', value: ''}]).concat(courses.find(c => c.name === filter.course).groups.map(g => g.name))"
+            variant="outlined"
+            v-model="filter.group"
+            v-if="filter.course !== ''"
+            @update:modelValue="updateEvents"
+            hide-details
+          ></v-select>
+        </v-card>
       </div>
       <div id="calendar" style="flex: 1; overflow-y: scroll; padding: 8px">
         <ScheduleXCalendar :calendar-app="calendarApp" />
       </div>
     </v-main>
-  <v-navigation-drawer location="right" temporary v-model="info">
-    <h3>{{curEvent.calendarId}}</h3>
-    <h2>{{curEvent.description}}</h2>
+  <v-navigation-drawer location="right" temporary v-model="info" class="www pa-4" width="max-content" style="max-width: 40vw">
+    <span>{{curEvent.calendarId}} - {{curEvent.description}}</span>
+<!--    <br>-->
+    <span class="text-h4 font-weight-bold text-black">{{curEvent.title}}</span>
+    <v-divider></v-divider>
+    <div style="vertical-align: middle">
+      <v-icon icon="mdi-clock-outline"/> <span style="vertical-align: middle">
+      {{curEvent.start}} - {{curEvent.end}}
+    </span>
+    </div>
+    <v-divider></v-divider>
+    <v-btn variant="outlined" prepend-icon="mdi-open-in-new">Посещаемость</v-btn><br>
+    <v-btn variant="outlined" prepend-icon="mdi-pencil">Редактировать</v-btn><br>
+    <v-btn variant="outlined" prepend-icon="mdi-delete" color="error" @click="deleteCurrent">Удалить</v-btn>
   </v-navigation-drawer>
 </template>
 
@@ -82,13 +112,16 @@
     min-height: 0;
     padding: 4px 0
   }
+  .www > .v-navigation-drawer__content > *:not(:last-child) {
+    margin-bottom: 8px;
+  }
+  .www > .v-navigation-drawer__content > span {
+    display: block;
+  }
 </style>
 
 <script setup>
 import { ScheduleXCalendar } from '@schedule-x/vue'
-import { createDragAndDropPlugin } from '@schedule-x/drag-and-drop'
-import { createResizePlugin } from "@schedule-x/resize";
-import { createEventModalPlugin } from "@schedule-x/event-modal";
 import {
   createCalendar,
   viewDay,
@@ -102,22 +135,36 @@ import 'v-calendar/style.css';
 
 
 let courses = ref([
-  {name: "майнкрафт", groups: [{name: "1 курс"},{name: "2 курс"},{name: "3 курс"}]},
-  {name: "Курсы жития", groups: [{name: "4 курс"},{name: "5 курс"},{name: "6 курс"}]}
+  {name: "майнкрафт", groups: [{name: "1 группа"},{name: "2 группа"},{name: "3 группа"}]},
+  {name: "Курсы жития", groups: [{name: "4 группа"},{name: "5 группа"},{name: "6 группа"}]},
+  {name: "Занятие где можно нихера не делать", groups: [{name: "7 группа"},{name: "8 группа"},{name: "9 группа"}]},
+  {name: "Ищем печеньки", groups: [{name: "10 группа"},{name: "11 группа"},{name: "12 группа"}]},
+  {name: "Пытаемся спасти Сашу", groups: [{name: "13 группа"},{name: "14 группа"},{name: "15 группа"}]},
 ])
+
 let selCourse = ref("")
 let selGroup = ref("")
+let name = ref("")
 let value = ref(new Date())
 let start = ref(new Date())
+let end = ref(new Date(start.value.valueOf()+3600000))
+
 let info = ref(false)
 let curEvent = ref({})
-let end = ref(new Date(start.value.valueOf()+3600000))
+let events = ref(JSON.parse(localStorage.getItem("events") ?? "[]") ?? [])
+let filter = ref({
+  course: '',
+  group: '',
+})
+
 function checkError() {
   switch (true) {
     case !selCourse.value:
       return "Укажите курс"
     case !selGroup.value:
       return "Укажите группу"
+    case !name.value:
+      return "Укажите название занятия"
     case start.value.valueOf() > end.value.valueOf():
       return "Начало должно быть раньше конца";
     default:
@@ -149,7 +196,7 @@ const calendarApp = window.calendarApp = createCalendar({
     console.log(c)
     return c
   })(),
-  events: JSON.parse(localStorage.getItem("events") ?? "[]"),
+  events: events.value,
   callbacks: {
     onRangeUpdate(range) {
       value.value = new Date(range.start)
@@ -162,12 +209,20 @@ const calendarApp = window.calendarApp = createCalendar({
       updateEvents()
     }
   },
-  plugins: [
-    createDragAndDropPlugin(), createResizePlugin()
-  ]
 })
 
+function deleteCurrent() {
+  if (!curEvent.value) return
+  if (!confirm("Вы уверены?")) return //лень делать нормальный диалог пока что
+  const i = events.value.findIndex(e => e.id === curEvent.value.id)
+  events.value.splice(i, 1)
+  info.value = false
+  curEvent.value = {}
+  updateEvents()
+}
+
 function formatDate(d, time = true) {
+  console.log(d)
   let timestr = time ? ` ${d.getHours().toString().padStart(2,"0")}:${d.getMinutes().toString().padStart(2,"0")}` : ""
   return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,"0")}-${d.getDate().toString().padStart(2,"0")}${timestr}`
 }
@@ -175,21 +230,27 @@ function formatDate(d, time = true) {
 function makeEvent() {
   let id = Math.floor(Math.random()*10000)
   let [s,e] = [start.value, end.value]
+  console.log(s,e)
   console.log(formatDate(s), formatDate(e))
   const event = {
     id,
     start: formatDate(s),
     end: formatDate(e),
-    title: `${selCourse.value}: ${selGroup.value}`,
+    title: name.value,
     calendarId: selCourse.value,
     description: selGroup.value,
   }
   console.log(event)
-  calendarApp.events.add(event)
+  events.value.push(event)
   updateEvents()
 }
 
 function updateEvents() {
-  localStorage.setItem("events", JSON.stringify(calendarApp.events.getAll()))
+  calendarApp.events.set(events.value.filter(
+    event =>
+      (filter.value.course ? event.calendarId === filter.value.course : true) &&
+      (filter.value.group ? event.description === filter.value.group : true)
+  ))
+  localStorage.setItem("events", JSON.stringify(events.value))
 }
 </script>
