@@ -1,4 +1,4 @@
-// const { pool } = require('../../dependencies');
+const { pool } = require('../../dependencies');
 const fs = require('fs')
 async function getDataForDocPDF(object) {
     const data = {
@@ -112,23 +112,7 @@ async function act2NotSigned() {
     let client = await pool.connect();
 
     try {
-        const queryProjects = `SELECT CONCAT_WS(' ', b."bioLastname", b."bioName", b."bioMiddlename") AS "fio",
-                                      u."userPhone",
-                                      p."projectId",
-                                      TO_CHAR(p."projectDateGiveLoan", 'DD.MM.YYYY')                  AS "projectDateGiveLoan"
-                               FROM projects p
-                                        LEFT JOIN documents d
-                                                  ON ("documentMeta"::jsonb ->> 'projectId')::integer =
-                                                     p."projectId" AND d."documentType" = 13
-                                        INNER JOIN userprofile up ON p."projectOwner" = up.id
-                                        INNER JOIN users u ON up."userId" = u."userId"
-                                        INNER JOIN bio b ON u."bioId" = b."bioId"
-                               WHERE p."projectStatus" = ANY ('{3,4,5,6,7,13}')
-                                 AND p."projectPlatformRules" > 8
-                                 AND CASE
-                                         WHEN d."documentId" IS NOT NULL THEN d."documentSignId" IS NOT NULL
-                                         ELSE FALSE END IS FALSE
-                               ORDER BY p."projectDateGiveLoan" DESC`;
+        const queryProjects = ``;
         const resProjects = await client.query(queryProjects);
 
         if (resProjects.rows.length > 0) {
@@ -153,14 +137,14 @@ async function act2NotSigned() {
             data.message = 'NOT FOUND';
         }
     } catch (e) {
-        winston.errorLog(e.stack, e.message);
+        console.log(e.stack, e.message);
         data = {
             message:    e.message,
             statusCode: 400,
         };
     } finally {
         client.release();
-        winston.infoLog('Release client');
+        console.log('Release client');
     }
 
     return data;
