@@ -19,19 +19,37 @@
           </template>
           <template v-slot:default="{ isActive }">
             <v-card title="Добавить занятие">
-              <v-text-field label="Название" required :model-value="name"></v-text-field>
-              <div style="display: flex; justify-content: space-evenly;">
-                <div style="display: grid">
-                  <span>Начало</span>
-                  <DatePicker mode="dateTime" is24hr v-model="start"></DatePicker>
+              <div class="pa-4">
+                <v-select
+                  label="Курс"
+                  :items="courses.map(c => c.name)"
+                  variant="outlined"
+                  v-model="selCourse"
+                  @update:modelValue="selGroup = ''"
+                ></v-select>
+                <v-select
+                  label="Группа"
+                  :items="selCourse ? courses.find(c => c.name === selCourse).groups.map(g => g.name) : []"
+                  variant="outlined"
+                  v-model="selGroup"
+                ></v-select>
+                <div style="display: flex; justify-content: space-between;">
+                  <div style="display: grid">
+                    <span>Начало</span>
+                    <DatePicker mode="dateTime" is24hr v-model="start"></DatePicker>
+                  </div>
+                  <div style="display: grid">
+                    <span>Конец</span>
+                    <DatePicker mode="dateTime" is24hr v-model="end"></DatePicker>
+                  </div>
                 </div>
-                <div style="display: grid">
-                  <span>Конец</span>
-                  <DatePicker mode="dateTime" is24hr v-model="end"></DatePicker>
-                </div>
+                <v-alert
+                  type="error"
+                  :text="checkError()"
+                  v-if="!!checkError()"
+                  variant="text"
+                ></v-alert>
               </div>
-
-              <v-text-field label="ХЗ" required></v-text-field>
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn
@@ -40,6 +58,7 @@
                 ></v-btn>
                 <v-btn
                   text="Добавить"
+                  :disabled="!!checkError()"
                   @click="makeEvent(); isActive.value = false"
                 ></v-btn>
               </v-card-actions>
@@ -52,6 +71,10 @@
         <ScheduleXCalendar :calendar-app="calendarApp" />
       </div>
     </v-main>
+  <v-navigation-drawer location="right" temporary v-model="info">
+    <h3>{{curEvent.calendarId}}</h3>
+    <h2>{{curEvent.description}}</h2>
+  </v-navigation-drawer>
 </template>
 
 <style>
@@ -78,48 +101,95 @@ import { Calendar, DatePicker } from 'v-calendar';
 import 'v-calendar/style.css';
 
 
-let name = ref("jkfjks")
+let courses = ref([
+  {name: "майнкрафт", groups: [{name: "1 курс"},{name: "2 курс"},{name: "3 курс"}]},
+  {name: "Курсы жития", groups: [{name: "4 курс"},{name: "5 курс"},{name: "6 курс"}]}
+])
+let selCourse = ref("")
+let selGroup = ref("")
 let value = ref(new Date())
 let start = ref(new Date())
+let info = ref(false)
+let curEvent = ref({})
 let end = ref(new Date(start.value.valueOf()+3600000))
-const calendarApp = createCalendar({
-  selectedDate: '2024-04-17',
+function checkError() {
+  switch (true) {
+    case !selCourse.value:
+      return "Укажите курс"
+    case !selGroup.value:
+      return "Укажите группу"
+    case start.value.valueOf() > end.value.valueOf():
+      return "Начало должно быть раньше конца";
+    default:
+      return null
+  }
+}
+// let canAdd = computed(() => {
+//   start.value.valueOf() <= end.value.valueOf()
+// })
+const calendarApp = window.calendarApp = createCalendar({
+  selectedDate: formatDate(new Date(), false),
   locale: "ru-RU",
   views: [viewDay, viewWeek, viewMonthGrid, viewMonthAgenda],
   defaultView: viewWeek.name,
-  events: (function () {
-    let ev = []
-    for (let i = 0; i < 5; i++) {
-      ev.push({
-        id: i,
-        start: `2024-04-17 ${(i%24).toString().padStart(2,"0")}:00`,
-        end: `2024-04-17 ${((i+1)%24).toString().padStart(2,"0")}:00`,
-        title: `aaa ${i}`
-      })
+  calendars: (() => {
+    let c = {}
+    let i = 0
+    const colors = [
+      {main: '#f9d71c', container: '#fff5aa', onContainer: '#594800'},
+      {main: '#1ca1f9', container: '#abddff', onContainer: '#003659'},
+      {main: '#1cf920', container: '#abffac', onContainer: '#005901'},
+      {main: '#f91c3d', container: '#ffabb7', onContainer: '#59000d'},
+      {main: '#6d1cf9', container: '#c7abff', onContainer: '#1e0059'},
+    ]
+    for (const course of courses.value) {
+      c[course.name] = {colorName: "color"+i ,lightColors: colors[i%colors.length]}
+      i++
     }
-    return ev
-  }) (),
+    console.log(c)
+    return c
+  })(),
+  events: JSON.parse(localStorage.getItem("events") ?? "[]"),
   callbacks: {
     onRangeUpdate(range) {
       value.value = new Date(range.start)
     },
     onEventClick(calendarEvent) {
-      console.log('onEventClick', calendarEvent)
+      curEvent.value = calendarEvent
+      info.value = true
     },
+    onEventUpdate(event) {
+      updateEvents()
+    }
   },
   plugins: [
-    createDragAndDropPlugin(), createResizePlugin(), createEventModalPlugin()
+    createDragAndDropPlugin(), createResizePlugin()
   ]
 })
 
+function formatDate(d, time = true) {
+  let timestr = time ? ` ${d.getHours().toString().padStart(2,"0")}:${d.getMinutes().toString().padStart(2,"0")}` : ""
+  return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,"0")}-${d.getDate().toString().padStart(2,"0")}${timestr}`
+}
+
 function makeEvent() {
-  let time = Math.floor(Math.random()*24)
   let id = Math.floor(Math.random()*10000)
-  calendarApp.events.add({
+  let [s,e] = [start.value, end.value]
+  console.log(formatDate(s), formatDate(e))
+  const event = {
     id,
-    start: `2024-04-17 ${(time%24).toString().padStart(2,"0")}:00`,
-    end: `2024-04-17 ${((time+1)%24).toString().padStart(2,"0")}:00`,
-    title: `aaa ${id}`
-  })
+    start: formatDate(s),
+    end: formatDate(e),
+    title: `${selCourse.value}: ${selGroup.value}`,
+    calendarId: selCourse.value,
+    description: selGroup.value,
+  }
+  console.log(event)
+  calendarApp.events.add(event)
+  updateEvents()
+}
+
+function updateEvents() {
+  localStorage.setItem("events", JSON.stringify(calendarApp.events.getAll()))
 }
 </script>
