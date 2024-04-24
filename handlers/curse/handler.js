@@ -73,7 +73,7 @@ async function getCourses(){
     let client = await pool.connect()
     let funcName = 'getCourses'
     try {
-        const getCourses = await client.query(`select "courseName","courseDescription" from courses`)
+        const getCourses = await client.query(`select * from courses`)
         data.message =   getCourses.rows
         data.statusCode = 200
 

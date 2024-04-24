@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue';
+import axios from "axios";
 
 let name = ref('')
 let description = ref('');
@@ -15,14 +16,24 @@ let courses = ref([{
   numberOfHours: 3
 }])
 
-function addCourse() {
+async function addCourse() {
   let course = {
     name: name.value,
     description: description.value,
     numberOfHours:numberOfHours.value,
     schedule:schedule.value
+    
   }
   courses.value.push(course)
+  console.log(courses)
+  try {
+    const response = await axios.post('/api/course/create',course);
+    courses.value = response.data;
+    // console.log(courses.value)
+  }
+  catch(err) {
+    console.error(err)
+  }
 }
 </script>
 
@@ -39,7 +50,7 @@ function addCourse() {
           <v-text-field
             class="block"
             :rules="[rules.required]"
-
+            v-model="name"
             label="Название"
             variant="outlined"
 
@@ -58,6 +69,7 @@ function addCourse() {
             color="orange orange-darken-4"
             label="Описание"
             variant="outlined"
+            v-model="description"
           ></v-textarea>
         </v-responsive>
       </div>
@@ -72,6 +84,8 @@ function addCourse() {
             hide-details="auto"
             label="Расписание"
             variant="outlined"
+            v-model="schedule"
+
             placeholder="Например: пн 16:00-18:00 ср 16:00-18:00"
             type="email"
           ></v-text-field>
@@ -87,6 +101,7 @@ function addCourse() {
             :rules="[rules.required]"
             hide-details="auto"
             label="Кол-во часов в занятии"
+            v-model="numberOfHours"
             variant="outlined"
             type="number"
 

@@ -3,8 +3,8 @@
   <v-btn variant="outlined" to="/createCourse">
     создать курсик
   </v-btn>
-<div>{{courses}}</div>
-  <v-table theme="dark">
+<!--<div>{{courses}}</div>-->
+  <v-table class="table" theme="light">
     <thead>
     <tr>
       <th class="text-left">
@@ -33,7 +33,11 @@
       :key="course.courseName"
     >
       <td>{{ course.courseName }}</td>
-      <td>{{ item.calories }}</td>
+      <td>{{ course.courseDescription }}</td>
+      <td>{{ course.schedule }}</td>
+      <td>{{ course.numberOfHours }}</td>
+      <td>{{ course.createDate }}</td>
+      <td>{{ course.updateDate }}</td>
     </tr>
     </tbody>
   </v-table>
@@ -49,6 +53,7 @@ async function getAllCourses() {
   try {
     const response = await axios.get('/api/course/get');
     courses.value = response.data;
+    console.log(courses.value)
   }
   catch(err) {
     console.error(err)
@@ -59,3 +64,10 @@ onMounted(() => {
   getAllCourses();
 })
 </script>
+<style>
+.table {
+  margin: 200px 300px;
+}
+
+
+</style>
