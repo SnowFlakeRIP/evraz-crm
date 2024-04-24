@@ -32,7 +32,7 @@ exports.up = pgm => {
         },
 
         userRole: {
-            type: `bigint`,
+            type: `varchar(255)`,
         },
 
         createdAt: {
