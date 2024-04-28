@@ -11,20 +11,41 @@
 
       <v-spacer></v-spacer>
 
-      <v-select
-        v-model="type"
-        :items="types"
-        class="ma-2"
-        variant="outlined"
-        dense
-        hide-details
-        density="compact"
-      ></v-select>
+      <!--      <v-select-->
+      <!--        v-model="type"-->
+      <!--        :items="types"-->
+      <!--        class="ma-2"-->
+      <!--        variant="outlined"-->
+      <!--        dense-->
+      <!--        hide-details-->
+      <!--        density="compact"-->
+      <!--      ></v-select>-->
 
       <v-btn icon>
         <v-icon>mdi-magnify</v-icon>
       </v-btn>
     </v-toolbar>
+  </div>
+
+  <div>
+    <v-dialog
+      v-model="dialog"
+      width="auto"
+    >
+      <v-card
+        max-width="400"
+        prepend-icon="mdi-plus"
+        title="Create event"
+      >
+        <template v-slot:actions>
+          <v-btn
+            class="ms-auto"
+            text="Save"
+            @click="dialog = false"
+          ></v-btn>
+        </template>
+      </v-card>
+    </v-dialog>
   </div>
 
   <div id="main">
@@ -36,11 +57,14 @@
         rounded
         prepend-icon="mdi-plus"
         size="large"
+        @click="dialog = true"
       >
         Create
       </v-btn>
 
       <v-date-picker
+        v-model="date"
+        v-on:update:modelValue="changeDateInSchedule"
         show-adjacent-months
         title='Enter date'
       ></v-date-picker>
@@ -92,6 +116,8 @@ export default {
     colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
     titles: ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party'],
     leftMenuVisible: true,
+    date: ref(),
+    dialog: false,
   }),
   mounted () {
     const adapter = useDate()
@@ -124,15 +150,21 @@ export default {
 
       this.events = events
     },
+
     getEventColor(event) {
       return event.color
     },
+
     rnd(a, b) {
       return Math.floor((b - a + 1) * Math.random()) + a
     },
 
     changeLeftMenuVisible() {
       this.leftMenuVisible = !this.leftMenuVisible;
+    },
+
+    changeDateInSchedule() {
+      this.value = [this.date];
     },
   },
 }
