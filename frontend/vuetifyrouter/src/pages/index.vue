@@ -42,11 +42,12 @@ export default{
   methods:{
       async join(){
           let request = {
-              phone:"89025493433",
+              phone:"89025493434",
               //email:"saksgs",
-              password:"password",
+              password:"newPassword",
           }
           if(this.$data.login.includes("'")||this.$data.password.includes("'")){
+            window.location.href = "https://www.youtube.com/watch?v=uSUT2STC4LE"
             alert("Не надо делать махинации")
             return
           }

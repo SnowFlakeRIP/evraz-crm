@@ -74,19 +74,37 @@
           ></v-text-field>
        </td>
        <td>
-         <v-btn :style="{ display: isReadonly ? 'none' : 'block'}"  @click="disableField">Сохранить</v-btn>
-         <v-btn :style="{ display: isReadonly ? 'block' : 'none'}" @click="enableField">Редактировать</v-btn>
+          <v-text-field
+            :readonly="isReadonly"
+           :disabled="isDisabled"
+            class="readonly custom-disabled-text"
+            v-model="user.newPassword"
+            color="primary"
+            label="Пароль"
+          ></v-text-field>
+       </td>
+       <td>
+         <v-btn color="success" :style="{ display: isReadonly ? 'none' : 'block'}"  @click="disableField">Сохранить</v-btn>
+         <v-btn color="success" :style="{ display: isReadonly ? 'block' : 'none'}" @click="enableField">Редактировать</v-btn>
+         <v-btn color="error" @click="deleteUser" >Удалить</v-btn>
        </td>
     </tr>
    </template>
    
    <script>
    import axios from 'axios'
+   import { toRaw } from 'vue';
+
    export default {
-    mounted(props){
-      console.log(this.$props)
-      console.log(props.roles)
-    },  
+    watch:{
+      roles:{
+        handler(newValue) {
+        // Код, который будет выполнен после обновления пропса user
+        console.log(newValue);
+        this.user.stringRole = newValue[this.user.userRole-1].roleValue
+      },
+      }
+    },
     props: {
        user: Object,
        items:Array,
@@ -95,6 +113,7 @@
     data() {
        return {
         editUser:{},
+        rolesGeted:this.$props.roles,
          isReadonly: true,
          notReadonly:false,
          isDisabled: true,
@@ -107,23 +126,15 @@
         ]
        };
     },
-
-
     methods: {
-      getRole(role){
-        console.log(this.$props.roles.find(Vrole => Vrole.roleValue === role).roleId)
-        return  this.$props.roles.find(Vrole => Vrole.roleValue === role).roleId
-        
-      },
-
       async requestParser(request){
-        const response = request.data
+          const response = request.data
 
-        return response
-      },
-
+          return response
+        },
       async requester(url,method, body){
         switch(method){
+
           case "GET":
           try{
             console.log(true)
@@ -143,9 +154,27 @@
               break
             }
           }
+
+          case "POST":
+          try{
+            const request = await axios.post(url,body,{
+              headers:{
+                "Content-Type": "application/json",
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`          
+              }
+            })       
+            return await this.requestParser(request)
+          }catch(e){        
+            console.log(e)
+            if (e.response?.data?.message === 'Access Token Invalid'){
+              await this.refresh()
+                this.requester(url,method,body)
+              break
+            }
+          }
+
           case "PUT":
           try{
-            console.log("POST")
             const request = await axios.put(url,body,{
               headers:{
                 "Content-Type": "application/json",
@@ -154,6 +183,7 @@
             })       
             return await this.requestParser(request)
           }catch(e){        
+            console.log(e)
             if (e.response?.data?.message === 'Access Token Invalid'){
               await this.refresh()
               this.requester(url,method,body)
@@ -161,6 +191,25 @@
             }
           }
       }},
+
+      async deleteUser(){
+        await this.requester("http://192.168.1.104:3000/users/admin/deleteUser","POST",{
+            email:this.user.userEmail
+          })
+        this.$emit("delete")  
+      },
+
+      getRole(role){
+        console.log(this.$props.roles.find(Vrole => Vrole.roleValue === role).roleId)
+        return  this.$props.roles.find(Vrole => Vrole.roleValue === role).roleId
+      },
+
+      async requestParser(request){
+        const response = request.data
+        return response
+      },
+
+
 
        enableField() {
          this.isReadonly = false;
@@ -183,10 +232,10 @@
                 role:this.getRole(this.user.stringRole),
                 phone:this.user.userPhone,
                 age:this.user.bioAge,
-                password:"password",
+                password:this.user.newPassword,
                 tdId:"xyq"
-              
           }
+          this.user.newPassword = ""
          console.log(request)
         
         let res = await this.requester(`http://192.168.1.104:3000/users/admin/updateUser`,"PUT",request)

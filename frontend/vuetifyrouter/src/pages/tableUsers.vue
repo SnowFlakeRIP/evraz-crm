@@ -1,16 +1,18 @@
 <template>
-
-  <v-data-table
+    
+    <v-data-table
       :items="this.allUsers"
       :footer-props="{ 'items-per-page-options': [3] }"
       :headers="headers"
-   >
-
+    >
     <template v-slot:top>
-    </template>
+       <v-btn  @click="createUser"color="success" fab dark >Создать пользователя</v-btn>
+     </template>
+
+    
   
       <template v-slot:item="{ item }">
-        <user v-bind:user="item" v-bind:roles="this.$data.roles" v-bind:items="this.items"></user>
+        <user @delete = "deleteUser" v-bind:roles="roles" v-bind:user="item" v-bind:items="items"></user>
       </template>
 
    </v-data-table>
@@ -18,15 +20,22 @@
   <script>
   import axios from "axios"
   import user from "../components/user.vue"
-import { ref } from "vue";
+  import { ref } from "vue";
       export default{
 
-        methods:{
-          async requestParser(request){
-            const response = request.data
+      methods:{
+        createUser(){
+          window.location.href = "/createUser"
+        },
+        async deleteUser(email){
+          console.log("request")
+          this.getData()
+        },
+        async requestParser(request){
+          const response = request.data
 
-            return response
-          },
+          return response
+        },
 
       async requester(url,method, body){
         switch(method){
@@ -69,7 +78,7 @@ import { ref } from "vue";
       }},
           async getData(){
             try{
-            let users;
+              let users;
               let totalPages;
   
               await axios.get(`http://192.168.1.104:3000/users/admin/allUsers/`,{
@@ -92,22 +101,28 @@ import { ref } from "vue";
                     ...user.currentBio,
                     ...user.currentUser
                   }
+
                   this.allUsers.push(tuPush)
+
                 });
               }
 
               let response = await this.requester(`http://192.168.1.104:3000/users/admin/getRoles`,"GET",null)
-              
+
               this.$data.roles = response.sendRoles
-              console.log( JSON.parse(JSON.stringify(this.roles)))
-              this.items = this.roles.map(role=>role.roleValue)
+              
+              this.items = this.roles.map(role=>role.roleValeu)
+              console.log(this.items);
+              console.log(this.roles)
+
               return{
                   users,
-                  userFilter
+                  userFilter,
+
               }
-              
+             
             }catch(e){
-              if(e.response.data.message == "Access Token Invalid"){
+              if(e.response?.data?.message == "Access Token Invalid"){
                 this.refresh()
               }else{
                alert("Произошла ошибка",e.message)
@@ -145,10 +160,12 @@ import { ref } from "vue";
               ]),
               headers:[
             {
-              title:"Почта"
+              title:"Почта",
+              value:"userMail"
             },
             {
-              title:"Телефон"
+              title:"Телефон",
+              value:"userPhone"
             },
             {
               title:"Роль"
@@ -164,6 +181,9 @@ import { ref } from "vue";
             },
             {
               title:"Возраст"
+            },
+            {
+              title:"Пароль"
             },
             {
               title:"Действия"
