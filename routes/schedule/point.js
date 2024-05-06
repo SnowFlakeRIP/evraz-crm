@@ -1,4 +1,4 @@
-const { createLesson, getLesson, updateLesson, deleteLesson } = require('../../handlers/schedule/handler');
+const { createLesson, getLesson, getAllLessons, updateLesson, deleteLesson } = require('../../handlers/schedule/handler');
 
 module.exports = function (fastify, opts, next) {
     
@@ -39,6 +39,16 @@ module.exports = function (fastify, opts, next) {
         },
         async handler(request, reply) {
             const data = await getLesson(request.query);
+            reply.status(data.statusCode)
+            reply.send(data);
+        },
+    });
+
+    fastify.route({
+        url:    '/all',
+        method: 'GET',
+        async handler(request, reply) {
+            const data = await getAllLessons(request.query);
             reply.status(data.statusCode)
             reply.send(data);
         },

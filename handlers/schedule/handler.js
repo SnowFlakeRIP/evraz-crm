@@ -103,6 +103,38 @@ async function getLesson(object) {
     return data;
 }
 
+async function getAllLessons(object) {
+    const data = {
+        message:    'error',
+        statusCode: 400,
+    };
+
+    const funcName = 'getAllLessons';
+    const client = await pool.connect()
+    const log = (m) => console.log(`${funcName}: ${m}`)
+
+    try {
+        const lesson = await client.query(`select * from schedule`)
+        if (lesson.rows.length === 0) {
+            data.message = "Занятий не найдено"
+            log(data.message)
+            return data
+        }
+        data.message = "Занятия найдены"
+        log(data.message)
+        data.lessons = lesson.rows
+        data.statusCode = 200
+        return data
+    } catch (err) {
+        log(`CATCH ERROR`);
+        console.log(err.message, err.stack);
+    } finally {
+        client.release()
+    }
+
+    return data;
+}
+
 async function updateLesson(object) {
     const data = {
         message:    'error',
@@ -238,5 +270,5 @@ async function deleteLesson(object) {
 }
 
 module.exports = {
-    createLesson, getLesson, updateLesson, deleteLesson
+    createLesson, getLesson, getAllLessons, updateLesson, deleteLesson
 };

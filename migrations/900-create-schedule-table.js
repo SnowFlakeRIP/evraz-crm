@@ -34,6 +34,8 @@ exports.up = pgm => {
 
         isDone: {
             type: 'boolean',
+            notNull: true,
+            default: false,
         },
 
         visiting: {
