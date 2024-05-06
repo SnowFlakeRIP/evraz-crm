@@ -6,7 +6,26 @@
     <!--      <v-label class="ma-1">Месяц, Год</v-label>-->
     <v-btn icon="mdi-menu" @click="showMenu = !showMenu"/>
     <v-spacer></v-spacer>
-    <v-text-field label="Поиск" hide-details class="ma-2" :disabled="loaded !== 'true'"/>
+    <v-text-field label="Поиск" hide-details class="ma-2" :disabled="loaded !== 'true'" v-model="search" @update:model-value="updateFilter">
+      <v-menu activator="parent">
+        <v-list>
+          <v-list-item
+            v-for="item in filterSearch"
+            :key="item.id"
+            :value="item.id"
+            @click="openEvent(item.id)"
+            v-if="filterSearch.length > 0"
+          >
+            <v-list-item-title>{{ item.name }}</v-list-item-title>
+            <v-list-item-subtitle>
+              {{ courses.find(c => c.id === item.course).name }} - {{ groups.find(g => g.id === item.group).name }} ({{ formatDate(item.start, true, true) }} - {{ formatDate(item.end, true, true) }})
+            </v-list-item-subtitle>
+          </v-list-item>
+          <v-label class="pa-3" v-else>Ничего не найдено</v-label>
+        </v-list>
+
+      </v-menu>
+    </v-text-field>
   </v-toolbar>
   <v-main class="main" v-if="loaded === 'true'">
     <div id="options" style="padding: 8px; display: flex; flex-direction: column; gap: 8px; width: 15vw" v-if="showMenu">
@@ -153,18 +172,20 @@
                 <v-card-actions>
                   <v-btn
                     text="Удалить"
-                    @click="() => {if (deleteCurrent()) isActive.value = false}"
+                    :disabled="isProcessing"
+                    @click="() => {deleteEvent().then(r => {if (r) isActive.value = false})}"
                     color="error"
                   ></v-btn>
                   <v-spacer></v-spacer>
                   <v-btn
                     text="Отмена"
+                    :disabled="isProcessing"
                     @click="isActive.value = false"
                   ></v-btn>
                   <v-btn
                     text="Сохранить"
-                    :disabled="!!checkError(true)"
-                    @click="editEvent(); isActive.value = false"
+                    :disabled="!!checkError(true) || isProcessing"
+                    @click="putEvent().then(r => {isActive.value = false})"
                   ></v-btn>
                 </v-card-actions>
               </v-card>
@@ -228,6 +249,8 @@ import {
 import '@schedule-x/theme-default/dist/index.css'
 import {Calendar, DatePicker} from 'v-calendar';
 import 'v-calendar/style.css';
+import {ref, computed} from "vue"
+import {fi} from "vuetify/locale";
 
 
 let courses = ref([
@@ -255,6 +278,14 @@ let admin = ref(true)
 let showMenu = ref(true)
 let selCourse = ref(null)
 let selGroup = ref(null)
+
+let search = ref("")
+let filterSearch = ref([])
+function updateFilter() {filterSearch.value = events.value.filter(e =>
+  e.name.toLowerCase().startsWith(search.value)
+  || courses.value.find(c => c.id === e.course).name.toLowerCase().startsWith(search.value)
+  || groups.value.find(g => g.id === e.group).name.toLowerCase().startsWith(search.value)
+)}
 
 let name = ref("")
 let value = ref(new Date())
@@ -290,8 +321,9 @@ function checkError(edit = false) {
 // let canAdd = computed(() => {
 //   start.value.valueOf() <= end.value.valueOf()
 // })
-const calendarApp = window.calendarApp = createCalendar({
-  selectedDate: formatDate(new Date(), false),
+
+let calendarApp = window.calendarApp = createCalendar({
+  selectedDate: formatDate(value.value, false),
   locale: "ru-RU",
   views: [viewWeek, viewMonthGrid, viewMonthAgenda],
   defaultView: viewWeek.name,
@@ -316,88 +348,47 @@ const calendarApp = window.calendarApp = createCalendar({
       value.value = new Date(range.start)
     },
     onEventClick(calendarEvent) {
-      curEvent.value = events.value.find(e => e.id === calendarEvent.id)
-      editedEvent.value = Object.assign({}, curEvent.value)
-      console.log(editedEvent.value)
-      info.value = true
-    },
-    onEventUpdate(event) {
-      updateEvents()
+      openEvent(calendarEvent.id)
     }
   },
 })
 
-function deleteCurrent() {
-  if (!curEvent.value) return
-  if (!confirm("Вы уверены?")) return //лень делать нормальный диалог пока что
-  const i = events.value.findIndex(e => e.id === curEvent.value.id)
-  info.value = false
-  events.value.splice(i, 1)
-  updateEvents()
-  return true
+function dayOfYear(date) {
+  return Math.floor((date - new Date(date.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24))
 }
 
-function formatDate(d, time = true) {
+function formatDate(d, time = true, short = false) {
   if (!d) return "Invalid Date"
   if (!(d instanceof Date)) d = new Date(d)
-  let timestr = time ? ` ${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}` : ""
-  return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, "0")}-${d.getDate().toString().padStart(2, "0")}${timestr}`
-}
-
-function makeEvent() {
-  let id = Math.floor(Math.random() * 10000)
-  let [s, e] = [start.value, end.value]
-  console.log(s, e)
-  console.log(formatDate(s), formatDate(e))
-  // const event = {
-  //   id,
-  //   start: formatDate(s),
-  //   end: formatDate(e),
-  //   title: name.value,
-  //   calendarId: selCourse.value,
-  //   description: selGroup.value,
-  // }
-  const event = {
-    id,
-    course: selCourse.value,
-    group: selGroup.value,
-    name: name.value,
-    start: s,
-    end: e,
-    done: false,
-  }
-  console.log(event)
-  events.value.push(event)
-  updateEvents()
-}
-
-function editEvent() {
-  const target = events.value.findIndex(e => e.id === curEvent.value.id)
-  curEvent.value = Object.assign({}, editedEvent.value)
-  events.value[target] = curEvent.value
-  updateEvents()
+  const today = new Date()
+  const [todayD, todayY] = [dayOfYear(today), today.getFullYear()]
+  const [otherD, otherY] = [dayOfYear(d), d.getFullYear()]
+  let datestr = (short && todayD === otherD && todayY === otherY) ? "" : `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, "0")}-${d.getDate().toString().padStart(2, "0")}`
+  let timestr = time ? `${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}` : ""
+  return `${datestr}${datestr && timestr ? " " : ""}${timestr}`
 }
 
 function updateEvents() {
-  const ev = events.value.filter(
+  //todo: обновление списка событий ломает выбор даты в календаре. почему???????????????????????????????????????????????
+  events.value.filter(
     event =>
       (filter.value.course ? event.course === filter.value.course : true) &&
       (filter.value.group ? event.group === filter.value.group : true)
-  ).map(event => {
+  ).forEach(event => {
     event.start = new Date(event.start)
     event.end = new Date(event.end)
-    return {
+    const exist = calendarApp.events.get(event.id)
+    calendarApp.events[exist ? "update" : "add"]({
       id: event.id,
       start: formatDate(event.start),
       end: formatDate(event.end),
       title: event.name,
       calendarId: event.course,
       description: event.group,
-    }
+    })
   })
-  console.log(ev)
-  calendarApp.events.set(ev)
-  localStorage.setItem("events", JSON.stringify(events.value))
+  search.value = ""
+  updateFilter()
 }
 
 async function getEvents() {
@@ -414,7 +405,7 @@ async function getEvents() {
   (json.lessons ?? []).forEach(event => {
     console.log(event)
     events.value.push({
-      id: event.id,
+      id: +event.id,
       course: groups.value.find(g => g.id == event.groupId).courseId,
       group: +event.groupId,
       name: event.name,
@@ -423,6 +414,7 @@ async function getEvents() {
       done: event.isDone
     })
   })
+  // calendarApp = window.calendarApp = calendar()
   loaded.value = "true"
   isProcessing.value = false
   updateEvents()
@@ -468,9 +460,32 @@ async function putEvent(reload = true) {
   })
   if (resp.status !== 200) {isProcessing.value = false; return alert("Ошибка")}
   const data = await resp.json()
-  curEvent.value.done = data.lesson.isDone;
+  curEvent.value = Object.assign(curEvent.value, ev);
   isProcessing.value = false;
   if (reload) getEvents()
+}
+
+async function deleteEvent() {
+  if (!confirm("Вы уверены?")) return //лень делать нормальный диалог пока что
+  isProcessing.value = true
+  const resp = await fetch(`${api}/schedule`, {
+    method: "DELETE",
+    body: JSON.stringify({lessonId: curEvent.value.id}),
+    headers: {"Content-Type": "application/json"}
+  })
+  if (resp.status !== 200) {isProcessing.value = false; return alert("Ошибка")}
+  info.value = false
+  isProcessing.value = false;
+  getEvents()
+  return true
+}
+
+function openEvent(id) {
+  const event = events.value.find(e => e.id === id)
+  if (!event) return
+  curEvent.value = event
+  editedEvent.value = Object.assign({}, curEvent.value)
+  info.value = true
 }
 
 getEvents()

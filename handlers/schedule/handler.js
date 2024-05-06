@@ -166,7 +166,7 @@ async function updateLesson(object) {
             log(data.message)
             return data
         }
-        current.endDate = startDate ?? current.endDate
+        current.endDate = endDate ?? current.endDate
 
         const group = object.groupId ? await client.query(`select * from groups where "groupId" = $1`, [object.groupId]) : undefined
         if (group && group.rows.length === 0) {
