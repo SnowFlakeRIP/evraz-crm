@@ -3,14 +3,14 @@ const {jwtDecode} = require("jwt-decode");
 require(`dotenv`).config()
 
 class TokenService {
-    create(id) {
+    create(id, role) {
         const accessToken = jwt.sign({
-            id
+            id, role
         }, process.env.SECRET_KEY, {
             expiresIn: `30m`
         })
         const refreshToken = jwt.sign({
-            id
+            id, role
         }, process.env.SUPER_SECRET_KEY, {
             expiresIn: `30d`
         })
@@ -26,7 +26,7 @@ class TokenService {
 
             const decoded = jwtDecode(refreshToken)
 
-            return this.create(decoded.id)
+            return this.create(decoded.id, decoded.role)
         } catch(err) {
             return `Refresh Token Invalid`
         }

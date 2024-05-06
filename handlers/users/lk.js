@@ -7,7 +7,7 @@ class Lk {
 
         try {
             const { name, middleName, lastName, age, phone, tgId } = request.body
-            const id = request.user
+            const {id} = request.user
 
             if (!name || !middleName || !lastName || !age || !phone) {
                 return reply.status(400).send({ message: `Вы не указали какие-то данные!` })
@@ -32,7 +32,7 @@ class Lk {
         const client = await pool.connect()
 
         try {
-            const id = request.user
+            const {id} = request.user
 
             await client.query(`UPDATE users SET "userActive" = $1, "updatedAt" = $3 WHERE "userId" = $2`, [false, "" + id + "", new Date()])
 

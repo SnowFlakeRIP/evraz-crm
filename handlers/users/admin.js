@@ -4,23 +4,6 @@ const { randomUUID } = require(`crypto`)
 const userDto = require(`../../dtos/userDto.js`)
 require(`dotenv`).config()
 
-async function checkAdminStatus(id) {
-    const funcName = `checkAdminStatusFunction`
-    const client = await pool.connect()
-
-    try {
-        const User = await client.query(`SELECT * FROM users WHERE "userId" = $1`, ["" + id + ""])
-
-        return !(User.rows.length < 1 || User.rows[0].userRole !== `3`)
-    } catch(err) {
-        console.error(`${funcName}: Ошибка при проверке админ-статуса!`)
-        console.error(err)
-        return false
-    } finally {
-        client.release()
-    }
-}
-
 class Admin {
 
     async updateUser(request, reply) {
@@ -29,11 +12,6 @@ class Admin {
 
         try {
             const { email, password, name, middleName, lastName, age, role, phone, tgId } = request.body
-            const id = request.user
-
-            if (!await checkAdminStatus(id)) {
-                return reply.status(403).send({ message: `Нет доступа!` })
-            }
 
             if (!email || !name || !middleName || !lastName || !age || !role || !phone) {
                 return reply.status(400).send({ message: `Вы не указали какие-то данные!` })
@@ -79,11 +57,6 @@ class Admin {
 
         try {
             const { userEmail, userPassword, userPhone, userName, userAge, userMiddleName, userLastName, role, tgId } = request.body
-            const id = request.user
-
-            if (!await checkAdminStatus(id)) {
-                return reply.status(403).send({ message: `У вас нет доступа!` })
-            }
 
             if (!userPassword || !userEmail || !userPhone || !userName || !userAge || !userMiddleName || !userLastName || !role) {
                 return reply.status(400).send({ message: `Вы не указали какие-то данные` })
@@ -132,11 +105,6 @@ class Admin {
 
         try {
             const { email } = request.body
-            const id = request.user
-
-            if (!await checkAdminStatus(id)) {
-                return reply.status(403).send({ message: `Нет доступа!` })
-            }
 
             const userCheck = await client.query(`SELECT * FROM users WHERE "userEmail" = $1`, ["" + email + ""])
 
@@ -166,12 +134,7 @@ class Admin {
         const client = await pool.connect()
 
         try {
-            const id = request.user
             const email = request.query.email
-
-            if(!await checkAdminStatus(id)) {
-                return reply.status(403).send({ message: "Нет доступа!" })
-            }
 
             if (!email) {
                 return reply.status(400).send({ message: "Вы не указали email!" })
@@ -205,11 +168,6 @@ class Admin {
 
         try {
             const {roleName} = request.body
-            const id = request.user
-
-            if (!await checkAdminStatus(id)) {
-                return reply.status(403).send({ message: "Нет доступа!" })
-            }
 
             if (!roleName) {
                 return reply.status(400).send({ message: "Не указано название роли!" })
@@ -232,12 +190,6 @@ class Admin {
         const client = await pool.connect()
 
         try {
-            const id = request.user
-
-            if (!await checkAdminStatus(id)) {
-                return reply.status(403).send({ message: "Нет доступа!" })
-            }
-
             const roles = await client.query(`SELECT * FROM roles`)
             const sendRoles = roles.rows
 
@@ -256,15 +208,10 @@ class Admin {
         const client = await pool.connect()
 
         try {
-            const id = request.user
             const needPage = request.params.page
             let page = 1
             const result = {
                 1: []
-            }
-
-            if (!await checkAdminStatus(id)) {
-                return reply.status(403).send({ message: "Нет доступа!" })
             }
 
             const Users = await client.query(`SELECT * FROM users`)

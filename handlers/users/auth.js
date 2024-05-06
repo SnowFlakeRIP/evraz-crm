@@ -37,7 +37,7 @@ class Auth {
                 return reply.status(400).send({ message: `Неверное имя пользователя или пароль!` })
             }
 
-            const { accessToken, refreshToken } = tokenService.create(User.rows[0].userId)
+            const { accessToken, refreshToken } = tokenService.create(User.rows[0].userId, User.rows[0].userRole)
 
             console.log(`${funcName}: Успешный вход пользователя`)
             return reply.status(200).send({ accessToken, refreshToken })
@@ -55,7 +55,7 @@ class Auth {
         const client = await pool.connect()
 
         try {
-            const id = request.user
+            const {id} = request.user
 
             const User = await client.query(`SELECT * FROM users WHERE "userId" = $1`, ["" + id + ""])
             const UserBio = await client.query(`SELECT * FROM bio WHERE "userId" = $1`, ["" + id + ""])

@@ -22,7 +22,10 @@ module.exports = fp((fastify, options, next) => {
 
             const parsed = jwtDecode(token)
 
-            request.user = parsed.id
+            request.user = {
+                id: parsed.id,
+                role: parsed.role
+            }
 
             next()
         } catch(err) {
