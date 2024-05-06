@@ -4,10 +4,12 @@
     <!--      <v-btn class="ma-1" icon="mdi-menu-left"/>-->
     <!--      <v-btn class="ma-1" icon="mdi-menu-right"/>-->
     <!--      <v-label class="ma-1">Месяц, Год</v-label>-->
+    <v-btn icon="mdi-menu" @click="showMenu = !showMenu"/>
+    <v-spacer></v-spacer>
     <v-text-field label="Поиск" hide-details class="ma-2" :disabled="loaded !== 'true'"/>
   </v-toolbar>
   <v-main class="main" v-if="loaded === 'true'">
-    <div id="options" style="padding: 8px; display: flex; flex-direction: column; gap: 8px;">
+    <div id="options" style="padding: 8px; display: flex; flex-direction: column; gap: 8px; width: 15vw" v-if="showMenu">
       <v-dialog max-width="600" v-if="admin">
         <template v-slot:activator="{ props: activatorProps }">
           <v-btn
@@ -55,12 +57,13 @@
               <v-spacer></v-spacer>
               <v-btn
                 text="Отмена"
+                :disabled="isProcessing"
                 @click="isActive.value = false"
               ></v-btn>
               <v-btn
                 text="Добавить"
-                :disabled="!!checkError()"
-                @click="makeEvent(); isActive.value = false"
+                :disabled="!!checkError() || isProcessing"
+                @click="postEvent().then(r => {isActive = false})"
               ></v-btn>
             </v-card-actions>
           </v-card>
@@ -101,7 +104,7 @@
         variant="text"
       >
         <v-card-actions>
-          <v-btn prepend-icon="mdi-sync" @click="loadData">Повторить</v-btn>
+          <v-btn prepend-icon="mdi-sync" @click="getEvents">Повторить</v-btn>
         </v-card-actions>
       </v-alert>
     </div>
@@ -124,7 +127,7 @@
           <!--        <br>-->
           <v-dialog max-width="600" v-if="admin">
             <template v-slot:activator="{ props: activatorProps }">
-              <v-btn v-bind="activatorProps" prepend-icon="mdi-pencil">Редактировать</v-btn>
+              <v-btn v-bind="activatorProps" prepend-icon="mdi-pencil" :disabled="isProcessing">Редактировать</v-btn>
             </template>
             <template v-slot:default="{ isActive }">
               <v-card title="Редактировать занятие">
@@ -172,7 +175,8 @@
             variant="flat"
             :color="curEvent.done ? 'info' : ''"
             :prepend-icon="curEvent.done ? 'mdi-check-circle' : 'mdi-check-circle-outline'"
-            @click="curEvent.done = !curEvent.done; updateEvents()"
+            :disabled="isProcessing"
+            @click="editedEvent.done = !curEvent.done; putEvent(false)"
           >{{ curEvent.done ? "Закончено" : "Не проведено" }}
           </v-btn>
         </v-card-actions>
@@ -244,30 +248,28 @@ let groups = ref((() => {
 
 console.log(groups.value)
 
-let loaded = ref("true") //false, error, true
-const api = `http://${location.hostname}:5000`
+let loaded = ref("false") //false, error, true
+const api = `http://${location.hostname}:5000` //todo: перенести апи на один порт
 
 let admin = ref(true)
+let showMenu = ref(true)
 let selCourse = ref(null)
 let selGroup = ref(null)
+
 let name = ref("")
 let value = ref(new Date())
 let start = ref(new Date())
 let end = ref(new Date(start.value.valueOf() + 3600000))
+let isProcessing = ref(false)
 
 let info = ref(false)
 let curEvent = ref({})
 let editedEvent = ref({})
-let events = ref(JSON.parse(localStorage.getItem("events") ?? "[]") ?? [])
+let events = []
 let filter = ref({
   course: null,
   group: null,
 })
-
-function loadData() {
-  loaded.value = 'true'
-  setTimeout(() => {loaded.value = 'true'}, 2000)
-}
 
 function checkError(edit = false) {
   // if (edit) console.log(curEvent.value.start.valueOf(), curEvent.value.end.valueOf())
@@ -316,6 +318,7 @@ const calendarApp = window.calendarApp = createCalendar({
     onEventClick(calendarEvent) {
       curEvent.value = events.value.find(e => e.id === calendarEvent.id)
       editedEvent.value = Object.assign({}, curEvent.value)
+      console.log(editedEvent.value)
       info.value = true
     },
     onEventUpdate(event) {
@@ -328,9 +331,8 @@ function deleteCurrent() {
   if (!curEvent.value) return
   if (!confirm("Вы уверены?")) return //лень делать нормальный диалог пока что
   const i = events.value.findIndex(e => e.id === curEvent.value.id)
-  events.value.splice(i, 1)
   info.value = false
-  curEvent.value = {}
+  events.value.splice(i, 1)
   updateEvents()
   return true
 }
@@ -398,13 +400,78 @@ function updateEvents() {
   localStorage.setItem("events", JSON.stringify(events.value))
 }
 
-updateEvents()
-
-async function loadFromServer() {
+async function getEvents() {
+  loaded.value = "false"
+  isProcessing.value = true
   const data = await fetch(`${api}/schedule/all`, {method: "GET"})
-  const j = await data.json()
-  console.log(j)
+  if (data.status !== 200) {
+    loaded.value = "error"
+    isProcessing.value = false
+    return
+  }
+  const json = await data.json();
+  events.value = [];
+  (json.lessons ?? []).forEach(event => {
+    console.log(event)
+    events.value.push({
+      id: event.id,
+      course: groups.value.find(g => g.id == event.groupId).courseId,
+      group: +event.groupId,
+      name: event.name,
+      start: new Date(event.startDate),
+      end: new Date(event.endDate),
+      done: event.isDone
+    })
+  })
+  loaded.value = "true"
+  isProcessing.value = false
+  updateEvents()
 }
 
-loadFromServer()
+async function postEvent() {
+  isProcessing.value = true
+  let [s, e] = [start.value, end.value]
+  const event = {
+    groupId: selGroup.value,
+    lessonName: name.value,
+    teacherId: 1,
+    startDate: s.valueOf(),
+    endDate: e.valueOf(),
+  }
+  const resp = await fetch(`${api}/schedule/`, {
+    method: "POST",
+    body: JSON.stringify(event),
+    headers: {"Content-Type": "application/json"}
+  })
+  if (resp.status !== 200) {isProcessing.value = false; return alert("Ошибка")}
+  const data = await resp.json()
+  getEvents()
+}
+
+async function putEvent(reload = true) {
+  // curEvent.value = Object.assign({}, editedEvent.value)
+  isProcessing.value = true
+  const ev = editedEvent.value
+  let event = {
+    lessonId: ev.id,
+    lessonName: ev.name,
+    teacherId: 1,
+    groupId: ev.group,
+    startDate: ev.start.valueOf(),
+    endDate: ev.end.valueOf(),
+    isDone: ev.done
+  }
+  const resp = await fetch(`${api}/schedule`, {
+    method: "PUT",
+    body: JSON.stringify(event),
+    headers: {"Content-Type": "application/json"}
+  })
+  if (resp.status !== 200) {isProcessing.value = false; return alert("Ошибка")}
+  const data = await resp.json()
+  curEvent.value.done = data.lesson.isDone;
+  isProcessing.value = false;
+  if (reload) getEvents()
+}
+
+getEvents()
 </script>

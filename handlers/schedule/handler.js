@@ -115,11 +115,6 @@ async function getAllLessons(object) {
 
     try {
         const lesson = await client.query(`select * from schedule`)
-        if (lesson.rows.length === 0) {
-            data.message = "Занятий не найдено"
-            log(data.message)
-            return data
-        }
         data.message = "Занятия найдены"
         log(data.message)
         data.lessons = lesson.rows
