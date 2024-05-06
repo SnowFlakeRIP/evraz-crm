@@ -14,8 +14,8 @@ async function createCourse(object) {
                                                  values ($1, $2, $3, $4)
                                                  returning "courseId"`,
             [
-                object.courseName,
-                object.courseDescription,
+                object.name,
+                object.description,
                 object.numberOfHours,
                 object.schedule
             ]

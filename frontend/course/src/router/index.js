@@ -18,7 +18,7 @@ const router = createRouter({
       children: [
         {
           path: '',
-          name: 'index',
+          name: 'courses',
           component: () => import('../pages/index.vue'),
         },
         {

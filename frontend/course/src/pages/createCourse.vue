@@ -1,6 +1,9 @@
 <script setup>
 import { ref } from 'vue';
 import axios from "axios";
+import { useRouter } from 'vue-router'
+
+const router = useRouter();
 
 let name = ref('')
 let description = ref('');
@@ -10,25 +13,19 @@ let rules = ref({
     required: value => !!value || 'Заполните поле',
 })
 
-let courses = ref([{
-  name:'rrrrrrrrrrr',
-  description:'ffhf',
-  numberOfHours: 3
-}])
-
 async function addCourse() {
   let course = {
-    name: name.value,
-    description: description.value,
+    name:name.value,
+    description:description.value,
     numberOfHours:numberOfHours.value,
     schedule:schedule.value
-    
   }
-  courses.value.push(course)
-  console.log(courses)
+
   try {
     const response = await axios.post('/api/course/create',course);
-    courses.value = response.data;
+    await router.push('/')
+    // router.back();
+    // courses.value = response.data;
     // console.log(courses.value)
   }
   catch(err) {
