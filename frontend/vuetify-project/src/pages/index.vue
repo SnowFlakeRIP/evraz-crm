@@ -1,10 +1,5 @@
 <template>
-  <v-btn variant="outlined" to="/pageReferalProgramm">
-    Реферальная программа
-  </v-btn>
-  <v-btn variant="outlined" to="/pageMyBonusSestema" >
-    Моя накопительная система
-  </v-btn>
+  <h3>Главная</h3>
 </template>
 
 <script setup>
