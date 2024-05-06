@@ -1,16 +1,17 @@
 <template>
-    
+
     <v-data-table
       :items="this.allUsers"
-      :footer-props="{ 'items-per-page-options': [3] }"
       :headers="headers"
+      :footer-props="{
+      'items-per-page-options': [3],
+      'items-per-page-text': 'Элементов на странице:'
+    }"
     >
     <template v-slot:top>
        <v-btn  @click="createUser"color="success" fab dark >Создать пользователя</v-btn>
      </template>
 
-    
-  
       <template v-slot:item="{ item }">
         <user @delete = "deleteUser" v-bind:roles="roles" v-bind:user="item" v-bind:items="items"></user>
       </template>
@@ -21,7 +22,7 @@
   import axios from "axios"
   import user from "../components/user.vue"
   import { ref } from "vue";
-      export default{
+    export default{
 
       methods:{
         createUser(){
@@ -150,7 +151,7 @@
           async mounted(){
 
               this.getData()
-             
+              document.querySelector(".v-data-table-footer__items-per-page span").innerHTML = "Пользователей на странице"
           },
           data(){
             return{

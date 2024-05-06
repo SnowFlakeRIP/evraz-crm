@@ -4,7 +4,6 @@
       <v-text-field
       v-model="login" placeholder="Электронная почта/номер телефона"
       :rules="rules"
-      hide-details="auto"
       label="Электронная почта/номер телефона"
     ></v-text-field>
 
@@ -12,9 +11,8 @@
       placeholder="Пароль"
       v-model="password" 
       :type="isPwd ? 'text' : 'password'"
-      :rules="rules"
-      hide-details="auto"
       label="Пароль"
+      :rules = "passwordRules"
       :append-icon="isPwd ? 'mdi-eye' : 'mdi-eye-off'"
       @click:append="isPwd = !isPwd"
     ></v-text-field>
@@ -33,18 +31,20 @@ export default{
           login:"",
           password:"",
           isPwd : ref(false),
-          rules: [
-            value => !!value || 'Обязательно',
-            value => (value && value.length >= 3) || 'Min 3 characters',
+          rules:[
+            value=> !!value || 'Обязательно',
+            value =>((/^[\d\+][\d\(\)\ -]{4,14}\d$/).test(value)||(/^[\w-\.]+@[\w-]+\.[a-z]{2,4}$/i).test(value))||'Неверно указан телефон или почта'
         ],
+          passwordRules:[
+              value=> !!value || 'Обязательно',
+              value => (value && value.length >= 2) ||'Неверно указан телефон или почта'
+          ]
       }
   },
   methods:{
       async join(){
           let request = {
-              phone:"89025493434",
-              //email:"saksgs",
-              password:"newPassword",
+              password:"",
           }
           if(this.$data.login.includes("'")||this.$data.password.includes("'")){
             window.location.href = "https://www.youtube.com/watch?v=uSUT2STC4LE"
@@ -76,10 +76,10 @@ export default{
             role:3,
             email:"test"
           }
-          await axios.put(`http://192.168.1.104:3000/users/admin/updateUser`,data,{
+          const res = await axios.get("http://192.168.1.104:3000/users/auth/refresh",{  
             headers:{
               "Content-Type":"application/json",
-              "Authorization":"Bearer "+localStorage.accessToken
+              "Authorization":"Bearer "+localStorage.refreshToken
               }
             })
       },
