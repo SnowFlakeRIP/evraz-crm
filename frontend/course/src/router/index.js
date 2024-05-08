@@ -25,6 +25,11 @@ const router = createRouter({
           path: 'createCourse',
           name: 'page1',
           component: () => import('../pages/createCourse.vue'),
+        },
+        {
+          path: 'course',
+          name: 'page1',
+          component: () => import('../pages/createCourse.vue'),
         }
       ]
     }

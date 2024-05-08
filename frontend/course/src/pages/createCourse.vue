@@ -32,6 +32,9 @@ async function addCourse() {
     console.error(err)
   }
 }
+
+
+
 </script>
 
 <template>
@@ -79,24 +82,6 @@ async function addCourse() {
             class="block"
             :rules="[rules.required]"
             hide-details="auto"
-            label="Расписание"
-            variant="outlined"
-            v-model="schedule"
-
-            placeholder="Например: пн 16:00-18:00 ср 16:00-18:00"
-            type="email"
-          ></v-text-field>
-        </v-responsive>
-      </div>
-      <div>
-        <v-responsive
-          class="mx-auto"
-          max-width="344"
-        >
-          <v-text-field
-            class="block"
-            :rules="[rules.required]"
-            hide-details="auto"
             label="Кол-во часов в занятии"
             v-model="numberOfHours"
             variant="outlined"
@@ -105,6 +90,13 @@ async function addCourse() {
           ></v-text-field>
 
         </v-responsive>
+      </div>
+      <div>
+        <v-select
+          label="Select"
+          :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
+          variant="outlined"
+        ></v-select>
       </div>
       <div>
         <v-responsive
