@@ -7,11 +7,15 @@ async function createSchedule(object){
 
     const funcName = 'createSchedule';
 
-    const createSchedule= await client.query(`INSERT INTO schedule ("name", "userEmail", "userPassword") VALUES($1,$2,$3) returning "userId"`,
+    const createSchedule= await client.query(`INSERT INTO schedule ("name", "groupId", "userId", "startDate", "endDate", "isDone", "visiting") VALUES($1,$2,$3,$4,$5,$6,$7) returning "userId"`,
         [
-            object.userPhone,
-            object.userEmail,
-            password
+            object.name,
+            object.groupId,
+            object.userId,
+            object.startDate,
+            object.endDate,
+            object.isDone,
+            object.visiting
         ],
     );
 

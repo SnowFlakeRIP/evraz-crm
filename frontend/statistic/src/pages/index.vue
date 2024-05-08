@@ -157,8 +157,6 @@
 import {ref} from "vue";
 import VueApexCharts from "vue3-apexcharts";
 
-const tab = ref('users');
-
 const usersActiveChart = ref(false);
 const usersSeries = ref([]);
 const usersChart = ref({
