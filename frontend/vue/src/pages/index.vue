@@ -1,6 +1,6 @@
 
 
-<template >
+<template>
 
 <!--  <div class="all">-->
 
@@ -110,6 +110,15 @@
 
 <!--  </div>-->
 
+  <v-data-table-virtual
+    :headers="documents">
+<!--    :items="desserts"-->
+<!--    :sort-by="[{ key: 'calories', order: 'asc' }]">-->
+
+    <template v-slot:item.actions="{ item }">  <!-- кнопка скачать ;-->
+    </template>
+
+  </v-data-table-virtual>
 </template>
 
 <script setup>
@@ -178,3 +187,5 @@ h3 {
   padding-bottom: 16%;
 }
 </style>
+<script lang="ts">
+</script>
