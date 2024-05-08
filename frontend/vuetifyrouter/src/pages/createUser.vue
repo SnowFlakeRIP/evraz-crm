@@ -123,6 +123,7 @@
       }
     },
     async mounted() {
+      this.checkToken()
       const response = await this.requester('http://192.168.1.104:3000/users/admin/getRoles','GET',null)
       console.log(response)
       this.roles = response.sendRoles
@@ -181,6 +182,7 @@
           })
           window.location.href = "/tableUsers"
         }catch(e) {
+          console.log(e)
           if (e.response.data.message == "Access Token Invalid") {
             this.refresh()
           } else {
@@ -213,7 +215,21 @@
       getRole(role){
         return  this.roles.find(Vrole => Vrole.roleValue === role).roleId
       },
-  
+      async checkToken() {
+        if(localStorage.refreshToken){
+            await axios.get("http://192.168.1.104:3000/users/auth/refresh",{
+              headers:{
+                "Content-Type":"application/json",
+                "Authorization":"Bearer "+localStorage.refreshToken
+              }
+            }).then((res)=>{
+                localStorage.accessToken = res.data.accessToken
+                localStorage.refreshToken = res.data.refreshToken
+            }).catch(()=>{
+                window.href.location="/login"
+            })
+            }
+        }
     }
     }
   

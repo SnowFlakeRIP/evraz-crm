@@ -99,10 +99,9 @@
     watch:{
       roles:{
         handler(newValue) {
-        // Код, который будет выполнен после обновления пропса user
         console.log(newValue);
         this.user.stringRole = newValue[this.user.userRole-1].roleValue
-      },
+        },
       }
     },
     props: {
@@ -233,7 +232,7 @@
                 phone:this.user.userPhone,
                 age:this.user.bioAge,
                 password:this.user.newPassword,
-                tdId:"xyq"
+                tdId:undefined
           }
           this.user.newPassword = ""
          console.log(request)
