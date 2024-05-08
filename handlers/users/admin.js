@@ -140,13 +140,16 @@ class Admin {
                 return reply.status(400).send({ message: "Вы не указали email!" })
             }
 
-            const User = await client.query(`SELECT * FROM users WHERE "userEmail" = $1`, ["" + email + ""])
+            let User = await client.query(`SELECT * FROM users WHERE "userEmail" = $1`, ["" + email + ""])
 
-            if (User.rows.length < 1) {
+            if (User.rows?.length < 1) {
                 return reply.status(404).send({ message: "Пользователь не найден!" })
             }
 
-            const UserBio = await client.query(`SELECT * FROM bio WHERE "userId" = $1`, [User.rows[0].userId])
+            User = User.rows[0]
+
+            let UserBio = await client.query(`SELECT * FROM bio WHERE "userId" = $1`, [User.userId])
+            UserBio = UserBio.rows[0]
 
             const object = {User, UserBio}
             const UserInfo = userDto(object)
@@ -249,6 +252,81 @@ class Admin {
             console.error(`${funcName}:  Ошибка при получении всех юзеров Админом`)
             console.error(err)
             return reply.status(500).send({ message: `Ошибка при получении данных админом: ${err}` })
+        } finally {
+            client.release()
+        }
+    }
+
+    async getStudents(request, reply) {
+        const funcName = `AdminGetStudents`
+        const client = await pool.connect()
+
+        try {
+            const filter = request.query.filter
+            const result = []
+
+            if (filter) {
+                const bios = await client.query(`SELECT * FROM bio WHERE concat_ws("bioName", "bioMiddleName", "bioLastName") ~* $1`, [filter])
+
+
+                for (let i in bios.rows) {
+                    const currentBio = bios.rows[i]
+                    let User = await client.query(`SELECT * FROM users WHERE "userId" = $1`, [currentBio.userId])
+                    User = User.rows[0]
+
+                    const object = {User, UserBio: currentBio}
+
+                    result.push(userDto(object))
+                }
+
+                if (result.length <= 0) {
+                    return reply.status(404).send({ message: "Пользователи не найдены по текущему фильтру!" })
+                }
+            }
+            else {
+                const students = await client.query(`SELECT * FROM users WHERE "userRole" = $1 LIMIT 50`, [1])
+
+                for (let i in students.rows) {
+                    const currentStudent = students.rows[i]
+
+                    let bio = await client.query(`SELECT * FROM bio WHERE "userId" = $1`, [currentStudent.userId])
+                    bio = bio.rows[0]
+
+                    const object = {User: currentStudent, UserBio: bio}
+
+                    result.push(userDto(object))
+                }
+            }
+
+            return reply.status(200).send(result)
+        } catch(err) {
+            console.error(`${funcName}: Ошибка при получении студентов Админом`)
+            console.error(err)
+        } finally {
+            client.release()
+        }
+    }
+
+    async getTeachers(request, reply) {
+        const funcName = `AdminGetTeachers`
+        const client = await pool.connect()
+
+        try {
+            const filter = request.query.filter
+
+            const result = []
+
+            if (filter) {
+
+            }
+            else {
+
+            }
+
+            return reply.status(200).send(result)
+        } catch(err) {
+            console.error(`${funcName}: Ошибка при получении учителей Админом`)
+            console.error(err)
         } finally {
             client.release()
         }

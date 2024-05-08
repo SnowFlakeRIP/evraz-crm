@@ -1,6 +1,6 @@
 module.exports = function(object) {
-    const User = object.User.rows[0]
-    const Bio = object.UserBio.rows[0]
+    const User = object.User
+    const Bio = object.UserBio
 
     return {
         userId: User.userId,

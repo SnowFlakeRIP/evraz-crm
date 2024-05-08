@@ -16,5 +16,9 @@ module.exports = function (fastify, options, next) {
 
     fastify.get(`/admin/allUsers/:page`, { preHandler: checker }, Admin.allUsers)
 
+    fastify.get(`/admin/students`, { preHandler: checker }, Admin.getStudents)
+
+    fastify.get(`/admin/teachers`, { preHandler: checker }, Admin.getTeachers)
+
     next()
 }

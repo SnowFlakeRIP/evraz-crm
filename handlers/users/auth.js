@@ -57,8 +57,10 @@ class Auth {
         try {
             const {id} = request.user
 
-            const User = await client.query(`SELECT * FROM users WHERE "userId" = $1`, ["" + id + ""])
-            const UserBio = await client.query(`SELECT * FROM bio WHERE "userId" = $1`, ["" + id + ""])
+            let User = await client.query(`SELECT * FROM users WHERE "userId" = $1`, ["" + id + ""])
+            let UserBio = await client.query(`SELECT * FROM bio WHERE "userId" = $1`, ["" + id + ""])
+            User = User.rows[0]
+            UserBio = UserBio.rows[0]
 
             const object = {User, UserBio}
             const UserInfo = userDto(object)

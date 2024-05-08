@@ -16,9 +16,15 @@ exports.up = pgm => {
 
         courseDescription:{
             type: 'varchar(1500)',
+        },
+
+        numbersOfHours:{
+            type: `integer`
+        },
+
+        schedule: {
+            type: `varchar(255)`
         }
-
-
     })
 };
 
