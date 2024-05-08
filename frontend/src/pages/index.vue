@@ -54,15 +54,25 @@
                 variant="outlined"
                 v-model="selGroup"
               ></v-select>
+              <v-select
+                label="День недели"
+                :items = "days.map((d, i) => { return {title: d, value: i} })"
+                variant="outlined"
+                v-model="selDay"
+              >
+              </v-select>
               <v-text-field label="Название" variant="outlined" v-model="name"></v-text-field>
-              <div style="display: flex; justify-content: space-between;">
+              <div style="display: flex; justify-content: space-around;">
+                <div style="display: flex; justify-content: space-between;">
+                  <DatePicker v-model.range="range" range />
+                </div>
                 <div style="display: grid">
                   <span>Начало</span>
-                  <DatePicker mode="dateTime" is24hr v-model="start"></DatePicker>
+                  <DatePicker mode="time" hide-time-header is24hr v-model="startTime"></DatePicker>
                 </div>
                 <div style="display: grid">
                   <span>Конец</span>
-                  <DatePicker mode="dateTime" is24hr v-model="end"></DatePicker>
+                  <DatePicker mode="time" hide-time-header is24hr v-model="endTime"></DatePicker>
                 </div>
               </div>
               <v-alert
@@ -251,7 +261,9 @@ import {Calendar, DatePicker} from 'v-calendar';
 import 'v-calendar/style.css';
 import {ref, computed} from "vue"
 import {fi} from "vuetify/locale";
+import {effect, } from "@preact/signals-core"
 
+const days = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
 
 let courses = ref([
   {id: 1, name: "майнкрафт"},
@@ -271,13 +283,14 @@ let groups = ref((() => {
 
 console.log(groups.value)
 
-let loaded = ref("false") //false, error, true
+let loaded = ref("true") //false, error, true
 const api = `http://${location.hostname}:5000` //todo: перенести апи на один порт
 
 let admin = ref(true)
 let showMenu = ref(true)
 let selCourse = ref(null)
 let selGroup = ref(null)
+let selDay = ref(null)
 
 let search = ref("")
 let filterSearch = ref([])
@@ -289,8 +302,14 @@ function updateFilter() {filterSearch.value = events.value.filter(e =>
 
 let name = ref("")
 let value = ref(new Date())
-let start = ref(new Date())
-let end = ref(new Date(start.value.valueOf() + 3600000))
+// let startTime = ref(new Date(43200000))
+// let endTime = ref(new Date(46800000))
+let startTime = ref(0)
+let endTime = ref(0)
+let range = ref({
+  start: new Date(),
+  end: new Date(),
+})
 let isProcessing = ref(false)
 
 let info = ref(false)
@@ -309,9 +328,15 @@ function checkError(edit = false) {
       return "Укажите курс"
     case !selGroup.value && !edit:
       return "Укажите группу"
+    case selDay.value === null && !edit:
+      return "Укажите день недели"
     case !(edit ? editedEvent.value.name : name.value):
       return "Укажите название занятия"
-    case edit ? editedEvent.value.start.valueOf() > editedEvent.value.end.valueOf() : start.value.valueOf() > end.value.valueOf():
+    case !edit && range.value.start === null || range.value.end === null || range.value.start.valueOf() > range.value.end.valueOf():
+      return "Неверный промежуок дат";
+    case !edit && startTime.value === null || endTime.value === null || startTime.value.valueOf() > endTime.value.valueOf():
+      return "Неверный промежуток времени";
+    case edit && editedEvent.value.start.valueOf() > editedEvent.value.end.valueOf():
       return "Начало должно быть раньше конца";
     default:
       return null
@@ -322,36 +347,41 @@ function checkError(edit = false) {
 //   start.value.valueOf() <= end.value.valueOf()
 // })
 
-let calendarApp = window.calendarApp = createCalendar({
-  selectedDate: formatDate(value.value, false),
-  locale: "ru-RU",
-  views: [viewWeek, viewMonthGrid, viewMonthAgenda],
-  defaultView: viewWeek.name,
-  calendars: (() => {
-    let c = {}
-    let i = 0
-    const colors = [
-      {main: '#f9d71c', container: '#fff5aa', onContainer: '#594800'},
-      {main: '#1ca1f9', container: '#abddff', onContainer: '#003659'},
-      {main: '#1cf920', container: '#abffac', onContainer: '#005901'},
-      {main: '#f91c3d', container: '#ffabb7', onContainer: '#59000d'},
-      {main: '#6d1cf9', container: '#c7abff', onContainer: '#1e0059'},
-    ]
-    for (const course of courses.value) {
-      c[course.id] = {colorName: "color" + i, lightColors: colors[i % colors.length]}
-      i++
-    }
-    return c
-  })(),
-  callbacks: {
-    onRangeUpdate(range) {
-      value.value = new Date(range.start)
+function calendar() {
+  return createCalendar({
+    selectedDate: formatDate(value.value, false),
+    locale: "ru-RU",
+    views: [viewWeek, viewMonthGrid, viewMonthAgenda],
+    defaultView: viewWeek.name,
+    calendars: (() => {
+      let c = {}
+      let i = 0
+      const colors = [
+        {main: '#f9d71c', container: '#fff5aa', onContainer: '#594800'},
+        {main: '#1ca1f9', container: '#abddff', onContainer: '#003659'},
+        {main: '#1cf920', container: '#abffac', onContainer: '#005901'},
+        {main: '#f91c3d', container: '#ffabb7', onContainer: '#59000d'},
+        {main: '#6d1cf9', container: '#c7abff', onContainer: '#1e0059'},
+      ]
+      for (const course of courses.value) {
+        c[course.id] = {colorName: "color" + i, lightColors: colors[i % colors.length]}
+        i++
+      }
+      return c
+    })(),
+    callbacks: {
+      onRangeUpdate(range) {
+        value.value = new Date(range.start)
+      },
+      onEventClick(calendarEvent) {
+        openEvent(calendarEvent.id)
+      }
     },
-    onEventClick(calendarEvent) {
-      openEvent(calendarEvent.id)
-    }
-  },
-})
+    // plugins: [new viewplugin()]
+  })
+}
+
+let calendarApp = window.calendarApp = calendar()
 
 function dayOfYear(date) {
   return Math.floor((date - new Date(date.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24))
@@ -370,6 +400,7 @@ function formatDate(d, time = true, short = false) {
 
 function updateEvents() {
   //todo: обновление списка событий ломает выбор даты в календаре. почему???????????????????????????????????????????????
+  const evs = []
   events.value.filter(
     event =>
       (filter.value.course ? event.course === filter.value.course : true) &&
@@ -377,8 +408,7 @@ function updateEvents() {
   ).forEach(event => {
     event.start = new Date(event.start)
     event.end = new Date(event.end)
-    const exist = calendarApp.events.get(event.id)
-    calendarApp.events[exist ? "update" : "add"]({
+    evs.push({
       id: event.id,
       start: formatDate(event.start),
       end: formatDate(event.end),
@@ -387,6 +417,7 @@ function updateEvents() {
       description: event.group,
     })
   })
+  calendarApp.events.set(evs)
   search.value = ""
   updateFilter()
 }
@@ -414,7 +445,7 @@ async function getEvents() {
       done: event.isDone
     })
   })
-  // calendarApp = window.calendarApp = calendar()
+  calendarApp = window.calendarApp = calendar()
   loaded.value = "true"
   isProcessing.value = false
   updateEvents()
@@ -422,13 +453,16 @@ async function getEvents() {
 
 async function postEvent() {
   isProcessing.value = true
-  let [s, e] = [start.value, end.value]
+  let [s, e] = [startTime.value, endTime.value]
   const event = {
     groupId: selGroup.value,
     lessonName: name.value,
     teacherId: 1,
-    startDate: s.valueOf(),
-    endDate: e.valueOf(),
+    startTime: s.valueOf(),
+    endTime: e.valueOf(),
+    startDate: startDate.value.valueOf(),
+    endDate: endDate.value.valueOf(),
+    weekDay: selDay.value
   }
   const resp = await fetch(`${api}/schedule/`, {
     method: "POST",
@@ -436,7 +470,6 @@ async function postEvent() {
     headers: {"Content-Type": "application/json"}
   })
   if (resp.status !== 200) {isProcessing.value = false; return alert("Ошибка")}
-  const data = await resp.json()
   getEvents()
 }
 

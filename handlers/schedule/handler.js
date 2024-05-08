@@ -15,17 +15,44 @@ async function createLesson(object) {
 
         const startDate = new Date(object.startDate)
         if (isNaN(startDate.valueOf())) {
-            data.message = 'Неверное время начала'
+            data.message = 'Неверная дата начала'
             log(data.message)
             return data
         }
 
         const endDate = new Date(object.endDate)
         if (isNaN(endDate.valueOf())) {
+            data.message = 'Неверная дата конца'
+            log(data.message)
+            return data
+        }
+
+        let startTime = new Date(object.startTime)
+        if (isNaN(startTime.valueOf())) {
+            data.message = 'Неверное время начала'
+            log(data.message)
+            return data
+        }
+        startTime = new Date(
+            startTime.getUTCHours() * 3600000
+            + startTime.getUTCMinutes() * 60000
+            + startTime.getUTCSeconds() * 1000
+        )
+
+        let endTime = new Date(object.endTime)
+        if (isNaN(endTime.valueOf())) {
             data.message = 'Неверное время конца'
             log(data.message)
             return data
         }
+        endTime = new Date(
+            endTime.getUTCHours() * 3600000
+            + endTime.getUTCMinutes() * 60000
+            + endTime.getUTCSeconds() * 1000
+        )
+
+        log(startTime)
+        log(endTime)
 
         const group = await client.query(`select * from groups where "groupId" = $1`, [object.groupId])
         if (group.rows.length === 0) {

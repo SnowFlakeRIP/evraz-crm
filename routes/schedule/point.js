@@ -14,8 +14,11 @@ module.exports = function (fastify, opts, next) {
                     groupId: {type: 'number'},
                     startDate: {type: 'number'},
                     endDate: {type: 'number'},
+                    weekDay: {type: 'number'},
+                    startTime: {type: 'number'},
+                    endTime: {type: 'number'},
                 },
-                required: ['lessonName', 'teacherId', 'groupId', 'startDate', 'endDate']
+                required: ['lessonName', 'teacherId', 'groupId', 'startDate', 'endDate', 'weekDay', 'startTime', 'endTime']
             }
         },
         async handler(request, reply) {
