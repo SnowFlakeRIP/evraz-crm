@@ -111,19 +111,48 @@
 <!--  </div>-->
 
   <v-data-table-virtual
-    :headers="documents">
-<!--    :items="desserts"-->
-<!--    :sort-by="[{ key: 'calories', order: 'asc' }]">-->
+    :items="documents">
+    <div v-if="hasDocumentFilters(document.filters)"
+         class="document">
 
-    <template v-slot:item.actions="{ item }">  <!-- кнопка скачать ;-->
-    </template>
+      <div class="date">
+
+        <div v-if="document.filters.date">
+          <input type="date">
+        </div>
+        <div v-else></div>
+
+      </div>
+
+      <div class="dateStart" >
+
+        <div v-if="document.filters.dateStart">
+          <input type="date">
+        </div>
+        <div v-else></div>
+
+      </div>
+
+      <div class="dateFinish">
+
+        <div v-if="document.filters.dateFinish">
+          <input type="date">
+        </div>
+        <div v-else></div>
+
+      </div>
+    </div>
+
+<!--    <template v-slot:item.actions="{ item }">  &lt;!&ndash; кнопка скачать ;&ndash;&gt;-->
+<!--    </template>-->
 
   </v-data-table-virtual>
 </template>
 
 <script setup>
 
-let documents = ref([
+
+const documents = ref([
   {
     name: 'Документ1',
     filters: {
@@ -164,28 +193,5 @@ function isObject(object) {
 
 <style>
 
-h3 {
-
-}
-
-.all {
-  display: flex;
-  justify-content: space-around;
-}
-
-.document{
-  padding: 5%;
-  display: flex;
-
-}
-
-.name {
-  padding-bottom: 30%;
-}
-
-.namedoc {
-  padding-bottom: 16%;
-}
 </style>
-<script lang="ts">
-</script>
+
