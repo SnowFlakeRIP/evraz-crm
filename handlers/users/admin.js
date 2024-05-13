@@ -4,6 +4,27 @@ const { randomUUID } = require(`crypto`)
 const userDto = require(`../../dtos/userDto.js`)
 require(`dotenv`).config()
 
+function generateDtoObject(rowsName) {
+    return {
+        User: {
+            userId: rowsName.userId,
+            userEmail: rowsName.userEmail,
+            userPhone: rowsName.userPhone,
+            userTelegramChatId: rowsName.userTelegramChatId,
+            userActive: rowsName.userActive,
+            userRole: rowsName.userRole,
+            userTelegram: rowsName.userTelegramChatId,
+        },
+        UserBio: {
+            bioName: rowsName.bioName,
+            bioAge: rowsName.bioAge,
+            bioMiddleName: rowsName.bioMiddleName,
+            bioLastName: rowsName.bioLastName,
+            bioInviteCode: rowsName.bioInviteCode
+        }
+    }
+}
+
 class Admin {
 
     async updateUser(request, reply) {
@@ -266,33 +287,31 @@ class Admin {
             const result = []
 
             if (filter) {
-                const bios = await client.query(`SELECT * FROM bio WHERE concat_ws("bioName", "bioMiddleName", "bioLastName") ~* $1`, [filter])
+                const students = await client.query(`SELECT * FROM users INNER JOIN bio ON bio."userId" = users."userId" WHERE "userRole" = $1 AND concat_ws("bioName", "bioMiddleName", "bioLastName") ~* $2`, [1, "" + filter + ""])
 
-
-                for (let i in bios.rows) {
-                    const currentBio = bios.rows[i]
-                    let User = await client.query(`SELECT * FROM users WHERE "userId" = $1`, [currentBio.userId])
-                    User = User.rows[0]
-
-                    const object = {User, UserBio: currentBio}
-
-                    result.push(userDto(object))
+                if (students.rows.length === 0) {
+                    return reply.status(404).send({ message: "Студенты по запрашиваемому фильтру не найдены!" })
                 }
+                else {
+                    for (let i in students.rows) {
+                        const currentStudent = students.rows[0]
 
-                if (result.length <= 0) {
-                    return reply.status(404).send({ message: "Пользователи не найдены по текущему фильтру!" })
+                        const object = generateDtoObject(currentStudent)
+
+                        result.push(userDto(object))
+                    }
                 }
             }
             else {
-                const students = await client.query(`SELECT * FROM users WHERE "userRole" = $1 LIMIT 50`, [1])
+                const students = await client.query(`SELECT * FROM users INNER JOIN bio ON bio."userId" = users."userId"  WHERE "userRole" = $1 LIMIT 50`, [1])
+
+                if (students.rows.length === 0) {
+                    return reply.status(404).send({ message: "Учителя по запрашиваемому фильтру не найдены!" })
+                }
 
                 for (let i in students.rows) {
-                    const currentStudent = students.rows[i]
-
-                    let bio = await client.query(`SELECT * FROM bio WHERE "userId" = $1`, [currentStudent.userId])
-                    bio = bio.rows[0]
-
-                    const object = {User: currentStudent, UserBio: bio}
+                    const currentStudent = students.rows[0]
+                    const object = generateDtoObject(currentStudent)
 
                     result.push(userDto(object))
                 }
@@ -317,10 +336,34 @@ class Admin {
             const result = []
 
             if (filter) {
+	            const teachers = await client.query(`SELECT * FROM users INNER JOIN bio ON bio."userId" = users."userId" WHERE "userRole" = $1 AND concat_ws("bioName", "bioMiddleName", "bioLastName") ~* $2`, [2, "" + filter + ""])
 
+                if (teachers.rows.length === 0) {
+                    return reply.status(404).send({ message: "Учителя по запрашиваемому фильтру не найдены!" })
+                }
+                else {
+                    for (let i in teachers.rows) {
+                        const currentTeacher = teachers.rows[0]
+
+                        const object = generateDtoObject(currentTeacher)
+
+                        result.push(userDto(object))
+                    }
+                }
             }
             else {
+                const teachers = await client.query(`SELECT * FROM users INNER JOIN bio ON bio."userId" = users."userId"  WHERE "userRole" = $1 LIMIT 50`, [2])
 
+                if (teachers.rows.length === 0) {
+                    return reply.status(404).send({ message: "Учителя по запрашиваемому фильтру не найдены!" })
+                }
+
+                for (let i in teachers.rows) {
+                    const currentTeacher = teachers.rows[0]
+                    const object = generateDtoObject(currentTeacher)
+
+                    result.push(userDto(object))
+                }
             }
 
             return reply.status(200).send(result)
