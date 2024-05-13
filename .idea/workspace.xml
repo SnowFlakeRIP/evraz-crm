@@ -5,49 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="331fa0af-da32-478c-9286-f535c48d4b6a" name="Changes" comment="исправления">
+      <change afterPath="$PROJECT_DIR$/evraz-crm-Filipp-def_copy-documents/backend/.env" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/test/App.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/test/HelloWorld.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/test/ProductsItem.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/test/ProductsList.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/.browserslistrc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/.editorconfig" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/.eslintrc-auto-import.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/.eslintrc.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/package-lock.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/public/favicon.ico" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/App.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/assets/logo.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/assets/logo.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/auto-imports.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/components.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/components/AppFooter.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/components/HelloWorld.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/components/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/layouts/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/layouts/default.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/main.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/pages/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/pages/index.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/plugins/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/plugins/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/plugins/vuetify.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/router/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/stores/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/stores/app.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/stores/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/styles/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/styles/settings.scss" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/test.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/typed-router.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/vite-env.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/tsconfig.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/tsconfig.node.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/vite.config.mts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/evraz-crm-Filipp-def_copy-documents/backend/handlers/documents/handler.js" beforeDir="false" afterPath="$PROJECT_DIR$/evraz-crm-Filipp-def_copy-documents/backend/handlers/documents/handler.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,12 +43,16 @@
   &quot;associatedIndex&quot;: 0
 }</component>
   <component name="ProjectId" id="2fXpvXZNgVCafVAv9cvOPrO0JgF" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
     "Node.js.handler.js.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "ToolWindowDatabase.ShowToolbar": "false",
@@ -102,24 +66,43 @@
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "npm.dev.executor": "Run",
+    "npm.start (1).executor": "Run",
     "npm.start.executor": "Run",
     "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
-    "ts.external.directory.path": "/home/filipp_fazliev/WebstormProjects/evraz-crm2/frontend/vue/node_modules/typescript/lib",
+    "ts.external.directory.path": "/home/filipp_fazliev/Загрузки/PhpStorm-241.15989.102/plugins/javascript-plugin/jsLanguageServicesImpl/external",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
     "ChangesTree.GroupingKeys": [
       "directory",
       "repository"
+    ],
+    "DatabaseDriversLRU": [
+      "postgresql"
     ]
   }
 }]]></component>
-  <component name="RunManager" selected="npm.dev">
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/evraz-crm-Filipp-def_copy-documents/backend" />
+    </key>
+  </component>
+  <component name="RunManager" selected="npm.start (1)">
     <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/frontend/vue/package.json" />
       <command value="run" />
       <scripts>
         <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="start (1)" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/evraz-crm-Filipp-def_copy-documents/backend/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="start" />
       </scripts>
       <node-interpreter value="project" />
       <envs />
@@ -137,6 +120,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="npm.start (1)" />
         <item itemvalue="npm.dev" />
         <item itemvalue="npm.start" />
       </list>
@@ -165,7 +149,7 @@
       <workItem from="1715008915250" duration="18000" />
       <workItem from="1715165673246" duration="986000" />
       <workItem from="1715170865621" duration="2424000" />
-      <workItem from="1715599729694" duration="457000" />
+      <workItem from="1715599729694" duration="4965000" />
     </task>
     <task id="LOCAL-00001" summary="855">
       <option name="closed" value="true" />
@@ -207,7 +191,15 @@
       <option name="project" value="LOCAL" />
       <updated>1715172100923</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="исправления">
+      <option name="closed" value="true" />
+      <created>1715600374946</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1715600374947</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -237,6 +229,7 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="855" />
     <MESSAGE value="исправления" />
     <option name="LAST_COMMIT_MESSAGE" value="исправления" />

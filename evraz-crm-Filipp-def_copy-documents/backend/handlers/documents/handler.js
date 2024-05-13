@@ -95,8 +95,6 @@ async function createBasicXLSX(columns, rows) {
         worksheet.columns = columns;
         worksheet.addRows(rows);
 
-        // todo: textWrap?
-
         data.buffer = await workbook.xlsx.writeBuffer();
     } catch (e) {
         data.error = e;
@@ -113,9 +111,9 @@ async function act2NotSigned() {
     let client = await pool.connect();
 
     try {
-        const queryProjects = `SELECT id FROM users`;
+        const queryProjects = `SELECT "userId" FROM users`;
         const resProjects = await client.query(queryProjects);
-
+        console.log(resProjects.rows)
         if (resProjects.rows.length > 0) {
             const columns = [
                 { header: 'ФИО', key: 'fio', width: 45 },
@@ -131,7 +129,7 @@ async function act2NotSigned() {
                 data.statusCode = 200;
             }
             else if (error) {
-                throw error;
+                console.log(error) ;
             }
         }
         else {
