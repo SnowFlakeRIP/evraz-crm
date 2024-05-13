@@ -2,7 +2,8 @@
 </template>
 <script>
   import axios from 'axios';
-  
+  import getRole from "@/getRole.js"
+  import checkToken from "@/chekToken"
   export default{
     data(){
         return{
@@ -10,24 +11,15 @@
         }
     },
     created(){
-        this.role = localStorage.role
+      console.log(2)
+      checkToken()
+      if(!getRole()){
+        window.location.href = "/login"
+      }
+      this.role = getRole()
     },
     methods:{
-      async checkToken() {
-        if(localStorage.refreshToken){
-            await axios.get("http://192.168.1.104:3000/users/auth/refresh",{
-              headers:{
-                "Content-Type":"application/json",
-                "Authorization":"Bearer "+localStorage.refreshToken
-              }
-            }).then((res)=>{
-                localStorage.accessToken = res.data.accessToken
-                localStorage.refreshToken = res.data.refreshToken
-            }).catch(()=>{
-                window.href.location="/login"
-            })
-            }
-        }
+      
     }
     }
   
@@ -39,7 +31,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh; /* Устанавливаем высоту контейнера равную высоте видимой области страницы */
+    height: 100vh; 
   }
   
   .centered {
@@ -62,6 +54,6 @@
     text-align: center;
   }
   .q-btn {
-    z-index: 1; /* Установите значение z-index для кнопки */
+    z-index: 1;
   }
   </style>

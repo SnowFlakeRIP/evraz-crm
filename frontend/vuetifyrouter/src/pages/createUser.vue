@@ -99,7 +99,9 @@
   <script>
   import { ref } from 'vue';
   import axios from 'axios';
-  
+  import checkToken from "@/chekToken";
+  import getRole from "@/getRole";
+
   document.title="Создание пользователя"
   export default{
     data() {
@@ -123,6 +125,11 @@
       }
     },
     async mounted() {
+      checkToken()
+      if(getRole()!==3){
+        window.location.href = "/createUser"
+        return
+      }
       this.checkToken()
       const response = await this.requester('http://192.168.1.104:3000/users/admin/getRoles','GET',null)
       console.log(response)

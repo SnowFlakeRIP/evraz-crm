@@ -1,5 +1,4 @@
 <template>
-
     <v-data-table
       :items="this.allUsers"
       :headers="headers"
@@ -22,9 +21,22 @@
   import axios from "axios"
   import user from "../components/user.vue"
   import { ref } from "vue";
+  import checkToken from "@/chekToken";
+  import getRole from "@/getRole";
     export default{
 
       methods:{
+        created(){
+            console.log(123321)
+            console.log(checkToken,getRole)
+            checkToken()
+            if(getRole()!==3){
+              window.location.href = "/createUser"
+              return
+            }
+            this.getData()
+            document.querySelector(".v-data-table-footer__items-per-page span").innerHTML = "Пользователей на странице"
+        },
         createUser(){
           window.location.href = "/createUser"
         },
@@ -34,7 +46,6 @@
         },
         async requestParser(request){
           const response = request.data
-
           return response
         },
 
@@ -148,11 +159,6 @@
         components:{
           user
         },
-          async mounted(){
-
-              this.getData()
-              document.querySelector(".v-data-table-footer__items-per-page span").innerHTML = "Пользователей на странице"
-          },
           data(){
             return{
               roles:[],

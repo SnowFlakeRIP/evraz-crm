@@ -6,7 +6,7 @@ export default async function getRole(){
                 "Authorization":"Bearer "+localStorage.refreshToken
             }
         })
-        return res.UserInfo.userRole
+        return res?.UserInfo?.userRole
     }catch(e){
         
     }
