@@ -29,9 +29,10 @@
     </thead>
     <tbody>
     <tr
-      v-for="course in courses"
-      :key="course.courseName"
+      v-for="(course,courseIndex) in courses"
+      :key="courseIndex"
       style="cursor: pointer;"
+      @click = "openCourse(course,courseIndex)"
     >
       <td>{{ course.courseName }}</td>
       <td>{{ course.courseDescription }}</td>
@@ -50,7 +51,10 @@ import axios from "axios";
 import {formatDate} from "@/scripts/date";
 
 const courses = ref([]);
-
+function openCourse(course,courseIndex){
+  console.log(course,courseIndex)
+  window.location.href = '/openCourse'
+}
 async function getAllCourses() {
   try {
     const response = await axios.get('/api/course/get');

@@ -91,13 +91,13 @@ async function addCourse() {
 
         </v-responsive>
       </div>
-      <div>
-        <v-select
-          label="Select"
-          :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
-          variant="outlined"
-        ></v-select>
-      </div>
+<!--      <div>-->
+<!--        <v-select-->
+<!--          label="Select"-->
+<!--          :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"-->
+<!--          variant="outlined"-->
+<!--        ></v-select>-->
+<!--      </div>-->
       <div>
         <v-responsive
           class="mx-auto"
