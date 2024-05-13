@@ -21,22 +21,21 @@
   import axios from "axios"
   import user from "../components/user.vue"
   import { ref } from "vue";
-  import checkToken from "@/chekToken";
+  import checkToken from "@/checkToken";
   import getRole from "@/getRole";
     export default{
-
+      async mounted(){
+          await checkToken()
+          console.log(await getRole())
+          if(await getRole()!=3){
+            //window.location.href = "/login"
+            return
+          }
+          await this.getData()
+          document.querySelector(".v-data-table-footer__items-per-page span").innerHTML = "Пользователей на странице"
+      },
       methods:{
-        created(){
-            console.log(123321)
-            console.log(checkToken,getRole)
-            checkToken()
-            if(getRole()!==3){
-              window.location.href = "/createUser"
-              return
-            }
-            this.getData()
-            document.querySelector(".v-data-table-footer__items-per-page span").innerHTML = "Пользователей на странице"
-        },
+        
         createUser(){
           window.location.href = "/createUser"
         },
@@ -73,7 +72,7 @@
           case "POST":
           try{
             const request = await axios.post(url,{
-              data:data,
+              body:body,
               headers:{
                 "Content-Type": "application/json",
                 'Authorization': `Bearer ${localStorage.getItem('accessToken')}`          

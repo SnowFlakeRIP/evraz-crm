@@ -3,16 +3,16 @@
 <script>
   import axios from 'axios';
   import getRole from "@/getRole.js"
-  import checkToken from "@/chekToken"
+  import checkToken from "@/checkToken"
   export default{
     data(){
         return{
             role:"",
         }
     },
-    created(){
+    async created(){
       console.log(2)
-      checkToken()
+      await checkToken()
       if(!getRole()){
         window.location.href = "/login"
       }

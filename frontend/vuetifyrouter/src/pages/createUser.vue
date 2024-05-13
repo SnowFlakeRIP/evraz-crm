@@ -99,7 +99,7 @@
   <script>
   import { ref } from 'vue';
   import axios from 'axios';
-  import checkToken from "@/chekToken";
+  import checkToken from "@/checkToken";
   import getRole from "@/getRole";
 
   document.title="Создание пользователя"
@@ -125,12 +125,6 @@
       }
     },
     async mounted() {
-      checkToken()
-      if(getRole()!==3){
-        window.location.href = "/createUser"
-        return
-      }
-      this.checkToken()
       const response = await this.requester('http://192.168.1.104:3000/users/admin/getRoles','GET',null)
       console.log(response)
       this.roles = response.sendRoles
@@ -154,7 +148,7 @@
               const request = await axios.get(url,{
                 headers:{
                   "Content-Type": "application/json",
-                  Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+                  Authorization: `Bearer ${localStorage.accessToken}`
                 }
               })
               return await this.requestParser(request)
@@ -199,7 +193,7 @@
       },
   
       async refresh(){
-  
+        alert("Refresh")
         const res = await axios.get("http://192.168.1.104:3000/users/auth/refresh",{
           headers:{
             "Content-Type":"application/json",
@@ -222,21 +216,6 @@
       getRole(role){
         return  this.roles.find(Vrole => Vrole.roleValue === role).roleId
       },
-      async checkToken() {
-        if(localStorage.refreshToken){
-            await axios.get("http://192.168.1.104:3000/users/auth/refresh",{
-              headers:{
-                "Content-Type":"application/json",
-                "Authorization":"Bearer "+localStorage.refreshToken
-              }
-            }).then((res)=>{
-                localStorage.accessToken = res.data.accessToken
-                localStorage.refreshToken = res.data.refreshToken
-            }).catch(()=>{
-                window.href.location="/login"
-            })
-            }
-        }
     }
     }
   

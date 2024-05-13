@@ -8,8 +8,8 @@
         </v-toolbar-title>
       </v-app-bar>
 
+      <v-navigation-drawer class="menu" app   color="primary" dark >
 
-      <v-navigation-drawer class="menu" app v-model="drawer" color="primary" dark  v-if="role != 'false'">
         <v-list v-if="role == '3'">
           <v-list-item link href="/tableUsers">
             <v-list-item-title>Таблица пользователей</v-list-item-title>
@@ -26,14 +26,14 @@
         </v-list>
 
 
-        <v-list class="menu" app v-model="drawer" color="primary" dark v-if="role === '2'">
+        <v-list class="menu" app   color="primary" dark v-if="role == '2'">
           <v-list-item link href="/timetable">
             <v-list-item-title>Расписание</v-list-item-title>
           </v-list-item>
         </v-list>
 
 
-        <v-list class="menu" app v-model="drawer" color="primary" dark v-if="role === '1'">
+        <v-list class="menu" app   color="primary" dark v-if="role == '1'">
           <v-list-item link href="/tableUsers">
             <v-list-item-title>Реферальная система</v-list-item-title>
           </v-list-item>
@@ -82,6 +82,7 @@ import { ref } from 'vue';
     // })
 
     this.role = localStorage.role
+    console.log(typeof this.role)
     console.log(this.role)
   }, 
   methods: {

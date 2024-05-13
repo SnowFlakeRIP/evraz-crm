@@ -1,4 +1,15 @@
-<script setup>
+<script>
+import checkToken from "@/checkToken.js"
+import getRole from "@/getRole.js"
+  export default{
+    created(){
+      checkToken()
+      if(getRole()!==1){
+        window.location.href = "/login"
+      }
+    }
+  }
+
 let discount = 0
 let number_of_invitees = 0
 let until_next_discount = 0
