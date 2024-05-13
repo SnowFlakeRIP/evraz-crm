@@ -5,57 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="331fa0af-da32-478c-9286-f535c48d4b6a" name="Changes" comment="исправления">
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/test/App.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/test/HelloWorld.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/test/ProductsItem.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/test/ProductsList.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/.browserslistrc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/.editorconfig" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/.eslintrc-auto-import.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/.eslintrc.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/package-lock.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/public/favicon.ico" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/App.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/assets/logo.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/assets/logo.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/auto-imports.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/components.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/components/AppFooter.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/components/HelloWorld.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/components/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/layouts/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/layouts/default.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/main.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/pages/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/pages/index.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/plugins/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/plugins/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/plugins/vuetify.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/router/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/stores/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/stores/app.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/stores/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/styles/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/styles/settings.scss" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/test.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/typed-router.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/src/vite-env.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/tsconfig.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/tsconfig.node.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue/vite.config.mts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/vue/src/pages/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/vue/src/pages/index.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
-  </component>
-  <component name="ComposerSettings">
-    <execution />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -87,33 +44,32 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Node.js.handler.js.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "ToolWindowDatabase.ShowToolbar": "false",
-    "git-widget-placeholder": "Filipp-def__copy-documents",
-    "javascript.nodejs.core.library.configured.version": "18.10.0",
-    "javascript.nodejs.core.library.typings.version": "18.19.33",
-    "last_opened_file_path": "/home/filipp_fazliev/WebstormProjects/evraz-crm2",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "npm.dev.executor": "Run",
-    "npm.start.executor": "Run",
-    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
-    "ts.external.directory.path": "/home/filipp_fazliev/WebstormProjects/evraz-crm2/frontend/vue/node_modules/typescript/lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Node.js.handler.js.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;ToolWindowDatabase.ShowToolbar&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;Filipp-def__copy-documents&quot;,
+    &quot;javascript.nodejs.core.library.configured.version&quot;: &quot;18.10.0&quot;,
+    &quot;javascript.nodejs.core.library.typings.version&quot;: &quot;18.19.31&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/filipp_fazliev/WebstormProjects/evraz-crm2/backend&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
+    &quot;npm.start.executor&quot;: &quot;Run&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/home/filipp_fazliev/WebstormProjects/evraz-crm2/frontend/vue/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "ChangesTree.GroupingKeys": [
-      "directory",
-      "repository"
+  &quot;keyToStringList&quot;: {
+    &quot;ChangesTree.GroupingKeys&quot;: [
+      &quot;directory&quot;,
+      &quot;repository&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="npm.dev">
     <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/frontend/vue/package.json" />
@@ -145,8 +101,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-1d06a55b98c1-91d5c284f522-JavaScript-PS-241.15989.102" />
-        <option value="bundled-php-predefined-ba97393d7c68-c76157a7178b-com.jetbrains.php.sharedIndexes-PS-241.15989.102" />
+        <option value="bundled-js-predefined-1d06a55b98c1-91d5c284f522-JavaScript-WS-241.15989.105" />
       </set>
     </attachedChunks>
   </component>
@@ -164,8 +119,7 @@
       <workItem from="1715008677981" duration="190000" />
       <workItem from="1715008915250" duration="18000" />
       <workItem from="1715165673246" duration="986000" />
-      <workItem from="1715170865621" duration="2424000" />
-      <workItem from="1715599729694" duration="457000" />
+      <workItem from="1715170865621" duration="1205000" />
     </task>
     <task id="LOCAL-00001" summary="855">
       <option name="closed" value="true" />
@@ -199,15 +153,7 @@
       <option name="project" value="LOCAL" />
       <updated>1715166128453</updated>
     </task>
-    <task id="LOCAL-00005" summary="исправления">
-      <option name="closed" value="true" />
-      <created>1715172100923</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1715172100923</updated>
-    </task>
-    <option name="localTasksCounter" value="6" />
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
