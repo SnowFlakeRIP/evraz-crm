@@ -12,11 +12,8 @@ async function getActiveUsers() {
     const client = await pool.connect()
 
     try {
-        const users = await client.query(`select *
-                                          from users
-                                          where "userActive" is true`)
-
-        data.message = users.rows
+        const usersTrue = await client.query(`select count(*) from users where "userActive" = $1`,[true])
+        data.message = usersTrue.rows
         data.statusCode = 200
     } catch (err) {
 
@@ -29,5 +26,4 @@ async function getActiveUsers() {
 
 module.exports = {
     getActiveUsers: getActiveUsers,
-
 }

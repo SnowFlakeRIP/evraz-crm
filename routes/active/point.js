@@ -1,4 +1,4 @@
-const { getActiveUsers } = require('../../handlers/statistics/handler');
+const { getActiveUsers } = require('../../handlers/active/handler');
 
 module.exports = function (fastify, opts, next) {
 

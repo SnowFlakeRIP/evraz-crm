@@ -19,4 +19,20 @@ async function createSchedule(object){
         ],
     );
 
+    console.log(createSchedule)
+
+    if(createSchedule.rowCount === 0 || createSchedule.rows.length === 0){
+        console.log(`${funcName}: Запрос на создание занятия не выполнился`)
+
+        data.message = 'Запрос на создание занятия не выполнился'
+        data.statusCode = 404
+        return data
+    }
+
+    return data;
+
+}
+
+module.exports = {
+    createSchedule: createSchedule,
 }

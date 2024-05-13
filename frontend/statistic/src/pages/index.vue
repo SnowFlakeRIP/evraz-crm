@@ -103,6 +103,9 @@
         <div class="parentButton">
           <button @click="diagramLessons" class="button">Создать диаграмму</button>
         </div>
+        <div v-if="lessonsIsDoneChart" class="diagram">
+          <vue-apex-charts type="pie" width="800" :options="lessonsChart" :series="lessonsSeries"></vue-apex-charts>
+        </div>
       </v-window-item>
 
       <v-window-item value="payments">
@@ -156,6 +159,10 @@
 <script setup>
 import {ref} from "vue";
 import VueApexCharts from "vue3-apexcharts";
+import axios from "axios";
+import router from "@/router";
+
+const tab = ref("user")
 
 const usersActiveChart = ref(false);
 const usersSeries = ref([]);
@@ -177,8 +184,26 @@ const usersChart = ref({
     }
   }]
 });
+const lessonsIsDoneChart = ref(false)
 const lessonsSeries = ref([]);
-const lessonsChart = ref({});
+const lessonsChart = ref({
+  chart: {
+    width: 380,
+    type: 'pie',
+  },
+  labels: ['Проведённые занятия', 'Не проведённые занятия'],
+  responsive: [{
+    breakpoint: 480,
+    options: {
+      chart: {
+        width: 200
+      },
+      legend: {
+        position: 'bottom'
+      }
+    }
+  }]
+});
 const paymentsSeries = ref([]);
 const paymentsChart = ref({});
 
@@ -187,8 +212,19 @@ function diagramUsers() {
   usersActiveChart.value = true;
 }
 
-function diagramLessons() {
+async function diagramLessons() {
+  lessonsSeries.value = [55,100];
 
+  try{
+    const response = await axios.get('/api/isDone/schedule/isDone');
+    await router.push('/');
+    console.log(response)
+  }
+  catch(err){
+    console.error(err)
+  }
+
+  lessonsIsDoneChart.value = true;
 }
 
 function diagramPayments() {
