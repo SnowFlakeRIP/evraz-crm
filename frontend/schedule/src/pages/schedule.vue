@@ -27,23 +27,140 @@
     </v-toolbar>
   </div>
 
-  <div>
+  <div id="dialog">
     <v-dialog
       v-model="dialog"
-      width="auto"
+      max-width="740"
     >
       <v-card
-        max-width="400"
         prepend-icon="mdi-plus"
         title="Create event"
       >
-        <template v-slot:actions>
+        <v-card-text>
+          <v-row dense>
+            <v-col
+              cols="12"
+              sm="6"
+            >
+              <v-text-field
+                label="Name of the event*"
+                required
+                variant="underlined"
+              ></v-text-field>
+            </v-col>
+
+            <v-col
+              cols="12"
+              sm="6"
+            >
+              <v-select
+                :items="[]"
+                label="Type of event*"
+                required
+                variant="underlined"
+              ></v-select>
+            </v-col>
+
+            <v-col
+              cols="12"
+              sm="6"
+            >
+              <v-select
+                :items="[]"
+                label="Courses*"
+                required
+                variant="underlined"
+              ></v-select>
+            </v-col>
+
+            <v-col
+              cols="12"
+              sm="6"
+            >
+              <v-autocomplete
+                :items="[]"
+                label="Teacher*"
+                auto-select-first
+                multiple
+                variant="underlined"
+              ></v-autocomplete>
+            </v-col>
+
+            <!--            <v-col style="width: 350px; flex: 0 1 auto;">-->
+            <!--              <v-time-picker-->
+            <!--                title="Select start time"-->
+            <!--                format="24hr"-->
+            <!--                v-model="start"-->
+            <!--                :max="end"-->
+            <!--                size="small"-->
+            <!--              ></v-time-picker>-->
+            <!--            </v-col>-->
+            <!--            -->
+            <!--            <v-col style="width: 350px; flex: 0 1 auto;">-->
+            <!--              <v-time-picker-->
+            <!--                title="Select end time"-->
+            <!--                format="24hr"-->
+            <!--                v-model="end"-->
+            <!--                :min="start"-->
+            <!--              ></v-time-picker>-->
+            <!--            </v-col>-->
+
+            <v-col
+              cols="12"
+              sm="6"
+            >
+              <v-text-field
+                label="Select start time"
+                model-value="12:30:00"
+                type="time"
+                variant="underlined"
+              ></v-text-field>
+            </v-col>
+
+            <v-col
+              cols="12"
+              sm="6"
+            >
+              <v-text-field
+                label="Select end time"
+                model-value="12:30:00"
+                type="time"
+                variant="underlined"
+              ></v-text-field>
+            </v-col>
+
+            <v-col
+              cols="12"
+            >
+              <v-text-field
+                label="Homework"
+                required
+                variant="underlined"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+
+          <small class="text-caption text-medium-emphasis">*indicates required field</small>
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
           <v-btn
-            class="ms-auto"
-            text="Save"
+            text="Close"
+            variant="plain"
             @click="dialog = false"
           ></v-btn>
-        </template>
+
+          <v-btn
+            color="primary"
+            text="Save"
+            variant="tonal"
+            @click="dialog = false"
+          ></v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
   </div>
