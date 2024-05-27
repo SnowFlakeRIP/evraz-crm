@@ -10,6 +10,11 @@ exports.up = pgm => {
             primaryKey: true,
         },
 
+        sequenceId: {
+            type: 'uuid',
+            notNull: true,
+        },
+
         name: {
             type: 'varchar(250)',
         },

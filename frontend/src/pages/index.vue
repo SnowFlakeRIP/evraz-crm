@@ -18,7 +18,7 @@
           >
             <v-list-item-title>{{ courses.find(c => c.id === item.course).name }}</v-list-item-title>
             <v-list-item-subtitle>
-              {{ groups.find(g => g.id === item.group).name }} ({{ formatDisplayDate(item.start) }} - {{ formatDisplayDate(item.end) }})
+              {{ groups.find(g => g.id === item.group).name }} ({{ formatRange(item.start, item.end) }})
             </v-list-item-subtitle>
           </v-list-item>
           <v-label class="pa-3" v-else>Ничего не найдено</v-label>
@@ -56,7 +56,7 @@
               ></v-select>
               <v-select
                 label="День недели"
-                :items = "days.map((d, i) => { return {title: d, value: i} })"
+                :items = "days.map((d, i) => { return {title: d, value: (i+1)%7} })"
                 variant="outlined"
                 v-model="selDay"
               >
@@ -143,10 +143,10 @@
         <span>{{ groups.find(g => g.id === curEvent.group).name }}</span>
         <span class="text-h4 font-weight-bold text-black">{{ courses.find(c => c.id === curEvent.course).name }}</span>
         <v-divider></v-divider>
-        <div style="vertical-align: middle">
+        <div style="vertical-align: middle; display: flex; gap: 8px">
           <v-icon icon="mdi-clock-outline"/>
           <span style="vertical-align: middle">
-          {{ formatDisplayDate(curEvent.start) }} - {{ formatDisplayDate(curEvent.end) }}
+          {{ formatRange(curEvent.start, curEvent.end) }}
         </span>
         </div>
         <v-divider></v-divider>
@@ -243,6 +243,10 @@
 .sx__event:hover {
   cursor: pointer;
 }
+
+.sx__view-selection {
+  display: none;
+}
 </style>
 
 <script setup>
@@ -304,7 +308,7 @@ let startTime = ref(0)
 let endTime = ref(0)
 let range = ref({
   start: new Date(),
-  end: new Date(),
+  end: new Date(Date.now()+86400000),
 })
 let isProcessing = ref(false)
 
@@ -345,7 +349,8 @@ function calendar() {
   return createCalendar({
     selectedDate: formatDate(value.value, false),
     locale: "ru-RU",
-    views: [viewWeek, viewMonthGrid, viewMonthAgenda],
+    //views: [viewWeek, viewMonthGrid, viewMonthAgenda],
+    views: [viewWeek],
     defaultView: viewWeek.name,
     calendars: (() => {
       let c = {}
@@ -401,12 +406,39 @@ function formatDisplayDate(d, time = true) {
   let diff = (todayY !== otherY) ? 1000 : todayD - otherD
   let datestr =
     diff === 0 ? "сегодня" :
-    diff === -1 ? "завтра" :
-    diff === -2 ? "послезавтра" :
-    diff === 2 ? "позавчера" :
-    diff === 1 ? "вчера" : `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`
+      diff === -1 ? "завтра" :
+        diff === -2 ? "послезавтра" :
+          diff === 2 ? "позавчера" :
+            diff === 1 ? "вчера" : `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`
   let timestr = time ? `${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}` : ""
   return `${datestr}${datestr && timestr ? ", " : ""}${timestr}`
+}
+
+function formatRange(d1, d2) {
+  if (!d1 || !d2) return "Invalid Date"
+  [d1, d2] = [new Date(d1), new Date(d2)]
+  const today = new Date()
+  const [todayD, todayY] = [dayOfYear(today), today.getFullYear()]
+  const [otherD1, otherY1] = [dayOfYear(d1), d1.getFullYear()]
+  const [otherD2, otherY2] = [dayOfYear(d2), d2.getFullYear()]
+  let diff1 = (todayY !== otherY1) ? 1000 : todayD - otherD1
+  let diff2 = (todayY !== otherY2) ? 1000 : todayD - otherD2
+  let datestr1 =
+    diff1 === 0 ? "сегодня" :
+      diff1 === -1 ? "завтра" :
+        diff1 === -2 ? "послезавтра" :
+          diff1 === 2 ? "позавчера" :
+            diff1 === 1 ? "вчера" : `${d1.getDate()} ${months[d1.getMonth()]} ${d1.getFullYear()}`
+  let timestr1 = `${d1.getHours().toString().padStart(2, "0")}:${d1.getMinutes().toString().padStart(2, "0")}`
+  let datestr2 =
+    otherD1 === otherD2 && otherY1 === otherY2 ? "" :
+      diff1 === 0 ? "сегодня, " :
+        diff1 === -1 ? "завтра, " :
+          diff1 === -2 ? "послезавтра, " :
+            diff1 === 2 ? "позавчера, " :
+              diff1 === 1 ? "вчера, " : `${d2.getDate()} ${months[d2.getMonth()]} ${d2.getFullYear()}, `
+  let timestr2 = `${d2.getHours().toString().padStart(2, "0")}:${d2.getMinutes().toString().padStart(2, "0")}`
+  return `${datestr1}, ${timestr1} - ${datestr2}${timestr2}`
 }
 
 function updateEvents() {
@@ -448,6 +480,7 @@ async function getEvents() {
     console.log(event)
     events.value.push({
       id: +event.id,
+      sequence: event.sequenceId,
       course: groups.value.find(g => g.id == event.groupId).courseId,
       group: +event.groupId,
       name: event.name,
@@ -510,7 +543,20 @@ async function putEvent(reload = true) {
 }
 
 async function deleteEvent() {
-  if (!confirm("Вы уверены?")) return //лень делать нормальный диалог пока что
+  const count = events.value.filter(e => e.sequence === curEvent.value.sequence)
+  let a = ""
+  switch (true) {
+    case count.length%10 === 1 && count.length%100 !== 11:
+      a = "занятие будет удалено"
+      break
+    case count.length%10 >= 2 && count.length%10 <= 4:
+      a = "занятия будут удалены"
+      break
+    default:
+      a = "занятий будут удалены"
+      break
+  }
+  if (!confirm(`${count.length} ${a}. Вы уверены?`)) return //лень делать нормальный диалог пока что
   isProcessing.value = true
   const resp = await fetch(`${api}/schedule`, {
     method: "DELETE",

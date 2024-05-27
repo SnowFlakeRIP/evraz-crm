@@ -28,8 +28,6 @@ async function createLesson(object) {
     const log = (m) => console.log(`${funcName}: ${m}`)
 
     try {
-        //авторизация? я так и не понял где она делается
-
         const startDate = new Date(object.startDate)
         if (isNaN(startDate.valueOf())) {
             data.message = 'Неверная дата начала'
@@ -50,11 +48,11 @@ async function createLesson(object) {
             log(data.message)
             return data
         }
-        startTime = new Date(
-            startTime.getUTCHours() * 3600000
-            + startTime.getUTCMinutes() * 60000
-            + startTime.getUTCSeconds() * 1000
-        )
+        // startTime = new Date(
+        //     startTime.getUTCHours() * 3600000
+        //     + startTime.getUTCMinutes() * 60000
+        //     + startTime.getUTCSeconds() * 1000
+        // )
 
         let endTime = new Date(object.endTime)
         if (isNaN(endTime.valueOf())) {
@@ -62,11 +60,13 @@ async function createLesson(object) {
             log(data.message)
             return data
         }
-        endTime = new Date(
-            endTime.getUTCHours() * 3600000
-            + endTime.getUTCMinutes() * 60000
-            + endTime.getUTCSeconds() * 1000
-        )
+        // endTime = new Date(
+        //     endTime.getUTCHours() * 3600000
+        //     + endTime.getUTCMinutes() * 60000
+        //     + endTime.getUTCSeconds() * 1000
+        // )
+
+        console.log(startTime, endTime, object.startTime, object.endTime)
 
         const group = await client.query(`select * from groups where "groupId" = $1`, [object.groupId])
         if (group.rows.length === 0) {
@@ -88,11 +88,18 @@ async function createLesson(object) {
         for (const member of groupMembers.rows) {
             visiting[member.userId] = "not_visited"
         }
-
+        let seq
+        while (true) {
+            seq = crypto.randomUUID()
+            let exist = await client.query(`select * from schedule where "sequenceId" = $1`, [seq])
+            if (exist.rows.length === 0) break
+        }
         let lesson = []
         const period = getDates(startDate, endDate)
+        console.log(period)
         for (const date of period) {
-            lesson = await client.query(`insert into schedule (name, "groupId", "userId", "startDate", "endDate", visiting) values ($1,$2,$3,$4,$5,$6) returning *`, [object.lessonName, object.groupId, object.teacherId, new Date(date.valueOf() + startTime.valueOf()), new Date(date.valueOf() + endTime.valueOf()), visiting])
+            date.setUTCHours(0); date.setUTCMinutes(0); date.setUTCSeconds(0)
+            lesson = await client.query(`insert into schedule (name, "sequenceId", "groupId", "userId", "startDate", "endDate", visiting) values ($1,$2,$3,$4,$5,$6,$7) returning *`, [object.lessonName, seq, object.groupId, object.teacherId, new Date(date.valueOf() + startTime.valueOf()), new Date(date.valueOf() + endTime.valueOf()), visiting])
             if (lesson.rowCount === 0) {
                 data.message = "Занятие не добавлено"
                 data.statusCode = 500
@@ -254,7 +261,7 @@ async function updateLesson(object) {
         }
         console.log(visiting)
 
-        const lesson = await client.query(`update schedule set name = $1, "groupId" = $2, "userId" = $3, "startDate" = $4, "endDate" = $5, "isDone" = $6, visiting = $7 where id = $8 returning *`, [current.name, current.groupId, current.teacherId, current.startDate, current.endDate, current.isDone, visiting, object.lessonId])
+        const lesson = await client.query(`update schedule set name = $1, "groupId" = $2, "userId" = $3, "startDate" = $4, "endDate" = $5, "isDone" = $6, visiting = $7 where "sequenceId" = $8 returning *`, [current.name, current.groupId, current.teacherId, current.startDate, current.endDate, current.isDone, visiting, current.sequenceId])
         if (lesson.rowCount === 0) {
             data.message = "Занятие не обновлено"
             data.statusCode = 500
@@ -288,7 +295,7 @@ async function deleteLesson(object) {
     const log = (m) => console.log(`${funcName}: ${m}`)
 
     try {
-        const del_lesson = await client.query(`delete from schedule where id = $1`, [object.lessonId])
+        const del_lesson = await client.query(`delete from schedule where "sequenceId" = (select "sequenceId" from schedule where id = $1)`, [object.lessonId])
         if (del_lesson.rowCount === 0) {
             data.message = "Занятие не найдено или не удалено"
             log(data.message)
