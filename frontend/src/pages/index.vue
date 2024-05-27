@@ -16,9 +16,9 @@
             @click="openEvent(item.id)"
             v-if="filterSearch.length > 0"
           >
-            <v-list-item-title>{{ item.name }}</v-list-item-title>
+            <v-list-item-title>{{ courses.find(c => c.id === item.course).name }}</v-list-item-title>
             <v-list-item-subtitle>
-              {{ courses.find(c => c.id === item.course).name }} - {{ groups.find(g => g.id === item.group).name }} ({{ formatDate(item.start, true, true) }} - {{ formatDate(item.end, true, true) }})
+              {{ groups.find(g => g.id === item.group).name }} ({{ formatDisplayDate(item.start) }} - {{ formatDisplayDate(item.end) }})
             </v-list-item-subtitle>
           </v-list-item>
           <v-label class="pa-3" v-else>Ничего не найдено</v-label>
@@ -61,7 +61,6 @@
                 v-model="selDay"
               >
               </v-select>
-              <v-text-field label="Название" variant="outlined" v-model="name"></v-text-field>
               <div style="display: flex; justify-content: space-around;">
                 <div style="display: flex; justify-content: space-between;">
                   <DatePicker v-model.range="range" range />
@@ -141,13 +140,13 @@
   <v-bottom-sheet inset v-model="info">
     <v-card>
       <div class="www pa-4">
-        <span>{{ courses.find(c => c.id === curEvent.course).name }} - {{ groups.find(g => g.id === curEvent.group).name }}</span>
-        <span class="text-h4 font-weight-bold text-black">{{ curEvent.name }}</span>
+        <span>{{ groups.find(g => g.id === curEvent.group).name }}</span>
+        <span class="text-h4 font-weight-bold text-black">{{ courses.find(c => c.id === curEvent.course).name }}</span>
         <v-divider></v-divider>
         <div style="vertical-align: middle">
           <v-icon icon="mdi-clock-outline"/>
           <span style="vertical-align: middle">
-          {{ formatDate(curEvent.start) }} - {{ formatDate(curEvent.end) }}
+          {{ formatDisplayDate(curEvent.start) }} - {{ formatDisplayDate(curEvent.end) }}
         </span>
         </div>
         <v-divider></v-divider>
@@ -161,7 +160,6 @@
             <template v-slot:default="{ isActive }">
               <v-card title="Редактировать занятие">
                 <div class="pa-4">
-                  <v-text-field label="Название" variant="outlined" v-model="editedEvent.name"></v-text-field>
                   <div style="display: flex; justify-content: space-between;">
                     <div style="display: grid">
                       <span>Начало</span>
@@ -260,10 +258,9 @@ import '@schedule-x/theme-default/dist/index.css'
 import {Calendar, DatePicker} from 'v-calendar';
 import 'v-calendar/style.css';
 import {ref, computed} from "vue"
-import {fi} from "vuetify/locale";
-import {effect, } from "@preact/signals-core"
 
 const days = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
+const months = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"]
 
 let courses = ref([
   {id: 1, name: "майнкрафт"},
@@ -300,7 +297,6 @@ function updateFilter() {filterSearch.value = events.value.filter(e =>
   || groups.value.find(g => g.id === e.group).name.toLowerCase().startsWith(search.value)
 )}
 
-let name = ref("")
 let value = ref(new Date())
 // let startTime = ref(new Date(43200000))
 // let endTime = ref(new Date(46800000))
@@ -330,8 +326,6 @@ function checkError(edit = false) {
       return "Укажите группу"
     case selDay.value === null && !edit:
       return "Укажите день недели"
-    case !(edit ? editedEvent.value.name : name.value):
-      return "Укажите название занятия"
     case !edit && range.value.start === null || range.value.end === null || range.value.start.valueOf() > range.value.end.valueOf():
       return "Неверный промежуок дат";
     case !edit && startTime.value === null || endTime.value === null || startTime.value.valueOf() > endTime.value.valueOf():
@@ -398,6 +392,23 @@ function formatDate(d, time = true, short = false) {
   return `${datestr}${datestr && timestr ? " " : ""}${timestr}`
 }
 
+function formatDisplayDate(d, time = true) {
+  if (!d) return "Invalid Date"
+  if (!(d instanceof Date)) d = new Date(d)
+  const today = new Date()
+  const [todayD, todayY] = [dayOfYear(today), today.getFullYear()]
+  const [otherD, otherY] = [dayOfYear(d), d.getFullYear()]
+  let diff = (todayY !== otherY) ? 1000 : todayD - otherD
+  let datestr =
+    diff === 0 ? "сегодня" :
+    diff === -1 ? "завтра" :
+    diff === -2 ? "послезавтра" :
+    diff === 2 ? "позавчера" :
+    diff === 1 ? "вчера" : `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`
+  let timestr = time ? `${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}` : ""
+  return `${datestr}${datestr && timestr ? ", " : ""}${timestr}`
+}
+
 function updateEvents() {
   //todo: обновление списка событий ломает выбор даты в календаре. почему???????????????????????????????????????????????
   const evs = []
@@ -412,7 +423,7 @@ function updateEvents() {
       id: event.id,
       start: formatDate(event.start),
       end: formatDate(event.end),
-      title: event.name,
+      title: `${courses.value.find(c => c.id === event.course).name} - ${groups.value.find(g => g.id === event.group).name}`,
       calendarId: event.course,
       description: event.group,
     })
@@ -456,12 +467,12 @@ async function postEvent() {
   let [s, e] = [startTime.value, endTime.value]
   const event = {
     groupId: selGroup.value,
-    lessonName: name.value,
+    lessonName: `${courses.value.find(c => c.id === selCourse.value).name} - ${groups.value.find(g => g.id === selGroup.value).name}`,
     teacherId: 1,
     startTime: s.valueOf(),
     endTime: e.valueOf(),
-    startDate: startDate.value.valueOf(),
-    endDate: endDate.value.valueOf(),
+    startDate: range.value.start.valueOf(),
+    endDate: range.value.end.valueOf(),
     weekDay: selDay.value
   }
   const resp = await fetch(`${api}/schedule/`, {
@@ -479,7 +490,7 @@ async function putEvent(reload = true) {
   const ev = editedEvent.value
   let event = {
     lessonId: ev.id,
-    lessonName: ev.name,
+    lessonName: `${courses.value.find(c => c.id === ev.course).name} - ${groups.value.find(g => g.id === ev.group).name}`,
     teacherId: 1,
     groupId: ev.group,
     startDate: ev.start.valueOf(),

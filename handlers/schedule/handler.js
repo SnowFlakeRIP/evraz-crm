@@ -1,5 +1,22 @@
 const {pool} = require("../../dependencies")
 
+Date.prototype.addDays = function(days) {
+    let date = new Date(this.valueOf());
+    date.setDate(date.getDate() + days);
+    return date;
+}
+
+function getDates(startDate, stopDate) {
+    let dateArray = [];
+    let currentDate = startDate;
+    while (currentDate <= stopDate) {
+        dateArray.push(new Date (currentDate));
+        currentDate = currentDate.addDays(1);
+    }
+    return dateArray;
+}
+
+
 async function createLesson(object) {
     const data = {
         message:    'error',
@@ -51,9 +68,6 @@ async function createLesson(object) {
             + endTime.getUTCSeconds() * 1000
         )
 
-        log(startTime)
-        log(endTime)
-
         const group = await client.query(`select * from groups where "groupId" = $1`, [object.groupId])
         if (group.rows.length === 0) {
             data.message = "Группа не найдена"
@@ -75,16 +89,20 @@ async function createLesson(object) {
             visiting[member.userId] = "not_visited"
         }
 
-        const lesson = await client.query(`insert into schedule (name, "groupId", "userId", "startDate", "endDate", visiting) values ($1,$2,$3,$4,$5,$6) returning *`, [object.lessonName, object.groupId, object.teacherId, new Date(object.startDate), new Date(object.endDate), visiting])
-        if (lesson.rowCount === 0) {
-            data.message = "Занятие не добавлено"
-            data.statusCode = 500
-            log(data.message)
-            return data
+        let lesson = []
+        const period = getDates(startDate, endDate)
+        for (const date of period) {
+            lesson = await client.query(`insert into schedule (name, "groupId", "userId", "startDate", "endDate", visiting) values ($1,$2,$3,$4,$5,$6) returning *`, [object.lessonName, object.groupId, object.teacherId, new Date(date.valueOf() + startTime.valueOf()), new Date(date.valueOf() + endTime.valueOf()), visiting])
+            if (lesson.rowCount === 0) {
+                data.message = "Занятие не добавлено"
+                data.statusCode = 500
+                log(data.message)
+                return data
+            }
         }
-
         data.message = "Занятие добавлено"
         log(data.message)
+        data.addedLessons = lesson.rowCount
         data.lesson = lesson.rows[0]
         data.statusCode = 200
         return data
