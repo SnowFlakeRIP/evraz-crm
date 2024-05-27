@@ -1,157 +1,141 @@
-
-
 <template>
+  <v-table
+  >
+    <thead>
+    <tr>
+      <th class="text-left">
+        Документы
+      </th>
+      <th class="text-left">
+        Параметры
+      </th>
+      <th class="text-left">
+        Скачать
+      </th>
+    </tr>
+    </thead>
 
-<!--  <div class="all">-->
+    <tbody>
 
-<!--    <div class="firstColumn">-->
-<!--      <h3 class="namedoc">Документы</h3>-->
-<!--      <div-->
-<!--        v-for="(document, documentIndex) in documents"-->
-<!--        :key="documentIndex"-->
-<!--      >-->
+    <tr
+      v-for="(document, documentIndex) in documents"
+      :key="documentIndex"
+    >
+      <td>{{ document.name }}</td>
+      <td v-if="hasDocumentFilters(document)"
+           class="document">
+        <div class="filters">
+          <div class="date">
 
-<!--        <div class="document">-->
+            <div v-if="document.filters.date">
+              <v-text-field
+                class="tvari"
+                label="дата"
+                type="date"
+              >
+              </v-text-field>
+            </div>
+            <div v-else></div>
 
-<!--          <div class="name">{{document.name}}</div>-->
+          </div>
 
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
+          <div class="date" >
 
-<!--    <div class="secondColumn">-->
+            <div v-if="document.filters.dateStart">
+              <v-text-field
+                class="tvari"
+                label="дата"
+                type="date"
+              >
+              </v-text-field>
+            </div>
+            <div v-else></div>
 
-<!--      <h3>Параметры</h3>-->
+          </div>
 
-<!--      <div-->
-<!--        v-for="(document, documentIndex) in documents"-->
-<!--        :key="documentIndex"-->
-<!--      >-->
-<!--        <div v-if="hasDocumentFilters(document)"-->
-<!--              class="document">-->
+          <div class="date">
 
-<!--          <div class="date">-->
+            <p v-if="document.filters.dateFinish">
+              <v-text-field
+                class="tvari"
+                label="дата"
+                type="date"
+              >
+              </v-text-field>
+            </p>
+            <p v-else></p>
 
-<!--            <div v-if="document.filters.date">-->
-<!--              <input type="date">-->
-<!--            </div>-->
-<!--            <div v-else></div>-->
+          </div>
+          <div class="number">
 
-<!--          </div>-->
+            <div v-if="document.filters.number">
 
-<!--          <div class="dateStart" >-->
+              <v-input>
+                <v-text-field
+                  class="tvari"
+                  label=""
+                  type="number">
+                </v-text-field>
+              </v-input>
 
-<!--            <div v-if="document.filters.dateStart">-->
-<!--              <input type="date">-->
-<!--            </div>-->
-<!--            <div v-else></div>-->
+            </div>
 
-<!--          </div>-->
+            <div v-else></div>
 
-<!--          <div class="dateFinish">-->
-
-<!--            <div v-if="document.filters.dateFinish">-->
-<!--              <input type="date">-->
-<!--            </div>-->
-<!--            <div v-else></div>-->
-
-<!--          </div>-->
-
-
-<!--          &lt;!&ndash;?????????????????????????????????????????????????????????????????????????&ndash;&gt;-->
-<!--          <div class="number">-->
-
-<!--            <div v-if="document.filters.number">-->
-
-<!--              <v-input>-->
-<!--                <v-text-field>-->
-<!--                  <v-icon color="red">-->
-<!--                    mdi-plus-->
-<!--                  </v-icon>-->
-<!--&lt;!&ndash;                  <template v-slot:append>&ndash;&gt;-->
-<!--&lt;!&ndash;                    <v-icon color="red">&ndash;&gt;-->
-<!--&lt;!&ndash;                      mdi-plus&ndash;&gt;-->
-<!--&lt;!&ndash;                    </v-icon>&ndash;&gt;-->
-<!--&lt;!&ndash;                  </template>&ndash;&gt;-->
-<!--&lt;!&ndash;                  <template v-slot:prepend>&ndash;&gt;-->
-<!--&lt;!&ndash;                    <v-icon color="green">&ndash;&gt;-->
-<!--&lt;!&ndash;                      mdi-minus&ndash;&gt;-->
-<!--&lt;!&ndash;                    </v-icon>&ndash;&gt;-->
-<!--&lt;!&ndash;                  </template>&ndash;&gt;-->
-<!--                </v-text-field>-->
-<!--              </v-input>-->
-
-<!--            </div>-->
-
-<!--            <div v-else></div>-->
-
-
-<!--          </div>-->
-<!--        </div>-->
-
-<!--        <div v-else>-</div>-->
-<!--      </div>-->
-<!--    </div>-->
-
-<!--    <div class="thirdColumn">-->
-<!--      <h3>Скачивание</h3>-->
-<!--      <div-->
-<!--        v-for="(documentIndex) in documents"-->
-<!--        :key="documentIndex">-->
-<!--        <div class="document">-->
-<!--          <div class="download">-->
-<!--            <button>скачать</button>-->
-<!--          </div>-->
-<!--        </div>-->
-
-<!--      </div>-->
-
-<!--    </div>-->
-
-<!--  </div>-->
-
-  <v-data-table-virtual
-    :items="documents">
-    <div v-if="hasDocumentFilters(document.filters)"
-         class="document">
-
-      <div class="date">
-
-        <div v-if="document.filters.date">
-          <input type="date">
+          </div>
         </div>
-        <div v-else></div>
 
-      </div>
-
-      <div class="dateStart" >
-
-        <div v-if="document.filters.dateStart">
-          <input type="date">
+      </td>
+      <td v-else>-</td>
+      <td>
+        <div v-if="document.filters.type === 'exsel'">
+          <v-btn append-icon="$vuetify">
+            Скачать
+          </v-btn>
         </div>
-        <div v-else></div>
+        <div v-else>
+          <v-btn
+            append-icon="png">
+            Скачать
 
-      </div>
+<!--              <v-icon>-->
+<!--                <v-img-->
+<!--                  class="mb-4"-->
+<!--                  height="40"-->
+<!--                  src="@/assets/exsel.png"-->
+<!--                />-->
+<!--              </v-icon>-->
 
-      <div class="dateFinish">
 
-        <div v-if="document.filters.dateFinish">
-          <input type="date">
+          </v-btn>
         </div>
-        <div v-else></div>
-
-      </div>
-    </div>
-
-<!--    <template v-slot:item.actions="{ item }">  &lt;!&ndash; кнопка скачать ;&ndash;&gt;-->
-<!--    </template>-->
-
-  </v-data-table-virtual>
+      </td>
+    </tr>
+    </tbody>
+  </v-table>
 </template>
 
 <script setup>
+import { createVuetify } from "vuetify";
+import { mdi } from "vuetify/iconsets/mdi";
+import { png } from "@/assets/pdf.png";
+import * as components from "vuetify/components";
+import * as directives from "vuetify/directives";
 
 
+const vuetify = createVuetify({
+  components,
+  directives,
+  icons: {
+    defaultSet: "mdi",
+    sets: {
+      mdi,
+      custom: customSVGs,
+    },
+  },
+})
+
+nuxtApp.vueApp.use(vuetify)
 const documents = ref([
   {
     name: 'Документ1',
@@ -159,13 +143,14 @@ const documents = ref([
       date: true,
       dateStart: true ,
       dateFinish: false,
-      number: true
+      number: true,
+      type:'exsel',
     }
   },
   {
     name: 'Документ2',
     filters: {
-
+      type:'pdf'
     }
   },
   {
@@ -189,9 +174,221 @@ function isObjectEmpty(object) {
 function isObject(object) {
   return Object.prototype.toString.call(object).slice(8, -1) === 'Object';
 }
+
 </script>
 
 <style>
+.filters{
+  padding: 0;
+  display: flex;
+  flex-flow: column wrap;
+}
 
+.number{
+  padding: 0;
+  width: 160px;
+
+}
+.date{
+  padding: 5px;
+  width: 160px;
+
+}
 </style>
+<template>
+  <v-table
+  >
+    <thead>
+    <tr>
+      <th class="text-left">
+        Документы
+      </th>
+      <th class="text-left">
+        Параметры
+      </th>
+      <th class="text-left">
+        Скачать
+      </th>
+    </tr>
+    </thead>
 
+    <tbody>
+
+    <tr
+      v-for="(document, documentIndex) in documents"
+      :key="documentIndex"
+    >
+      <td>{{ document.name }}</td>
+      <td v-if="hasDocumentFilters(document)"
+           class="document">
+        <div class="filters">
+          <div class="date">
+
+            <div v-if="document.filters.date">
+              <v-text-field
+                class="tvari"
+                label="дата"
+                type="date"
+              >
+              </v-text-field>
+            </div>
+            <div v-else></div>
+
+          </div>
+
+          <div class="date" >
+
+            <div v-if="document.filters.dateStart">
+              <v-text-field
+                class="tvari"
+                label="дата"
+                type="date"
+              >
+              </v-text-field>
+            </div>
+            <div v-else></div>
+
+          </div>
+
+          <div class="date">
+
+            <p v-if="document.filters.dateFinish">
+              <v-text-field
+                class="tvari"
+                label="дата"
+                type="date"
+              >
+              </v-text-field>
+            </p>
+            <p v-else></p>
+
+          </div>
+          <div class="number">
+
+            <div v-if="document.filters.number">
+
+              <v-input>
+                <v-text-field
+                  class="tvari"
+                  label=""
+                  type="number">
+                </v-text-field>
+              </v-input>
+
+            </div>
+
+            <div v-else></div>
+
+          </div>
+        </div>
+
+      </td>
+      <td v-else>-</td>
+      <td>
+        <div v-if="document.filters.type === 'exsel'">
+          <v-btn append-icon="$vuetify">
+            Скачать
+          </v-btn>
+        </div>
+        <div v-else>
+          <v-btn
+            append-icon="png">
+            Скачать
+
+<!--              <v-icon>-->
+<!--                <v-img-->
+<!--                  class="mb-4"-->
+<!--                  height="40"-->
+<!--                  src="@/assets/exsel.png"-->
+<!--                />-->
+<!--              </v-icon>-->
+
+
+          </v-btn>
+        </div>
+      </td>
+    </tr>
+    </tbody>
+  </v-table>
+</template>
+
+<script setup>
+import { createVuetify } from "vuetify";
+import { mdi } from "vuetify/iconsets/mdi";
+import { png } from "@/assets/pdf.png";
+import * as components from "vuetify/components";
+import * as directives from "vuetify/directives";
+
+
+const vuetify = createVuetify({
+  components,
+  directives,
+  icons: {
+    defaultSet: "mdi",
+    sets: {
+      mdi,
+      custom: customSVGs,
+    },
+  },
+})
+
+nuxtApp.vueApp.use(vuetify)
+const documents = ref([
+  {
+    name: 'Документ1',
+    filters: {
+      date: true,
+      dateStart: true ,
+      dateFinish: false,
+      number: true,
+      type:'exsel',
+    }
+  },
+  {
+    name: 'Документ2',
+    filters: {
+      type:'pdf'
+    }
+  },
+  {
+    name: 'Документ3',
+    filters: {
+
+    }
+  }
+]);
+
+function hasDocumentFilters(document) {
+  return !isObjectEmpty(document.filters);
+}
+
+function isObjectEmpty(object) {
+  if (!isObject(object)) return false;
+
+  return Object.keys(object).length === 0;
+}
+
+function isObject(object) {
+  return Object.prototype.toString.call(object).slice(8, -1) === 'Object';
+}
+
+</script>
+
+<style>
+.filters{
+  padding: 0;
+  display: flex;
+  flex-flow: column wrap;
+}
+
+.number{
+  padding: 0;
+  width: 160px;
+
+}
+.date{
+  padding: 5px;
+  width: 160px;
+
+}
+</style>
