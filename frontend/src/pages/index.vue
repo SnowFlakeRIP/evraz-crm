@@ -29,7 +29,7 @@
       <template v-slot:activator="{ props: activatorProps }">
         <v-btn v-bind="activatorProps" :icon="filter.course ? 'mdi-filter' : 'mdi-filter-outline'"></v-btn>
       </template>
-      <template v-slot:default="isActiveFilter">
+      <template v-slot:default="isActive">
         <v-card class="pa-4">
           <v-select
             label="Курс"
@@ -91,7 +91,7 @@
                 >
                 </v-select>
               </div>
-              <div style="display: flex; flex-direction: column; gap: 16px;">
+              <div style="display: flex; flex-direction: column; gap: 16px; align-items: center">
                 <DatePicker v-model.range="range" range />
                 <DatePicker mode="time" hide-time-header is24hr v-model.range="rangeTime" range></DatePicker>
               </div>
@@ -357,7 +357,7 @@ function checkError(edit = false) {
       return "Укажите день недели"
     case !edit && range.value.start === null || range.value.end === null || range.value.start.valueOf() > range.value.end.valueOf():
       return "Неверный промежуок дат";
-    case !edit && rangeTime.value.start === null || rangeTime.value.end === null || rangeTime.value.start.valueOf() > rangeTime.value.end.valueOf():
+    case !edit && rangeTime.value.start === null || rangeTime.value.end === null || rangeTime.value.start.valueOf() > rangeTime.value.end.valueOf() || rangeTime.value.start.valueOf() === rangeTime.value.end.valueOf():
       return "Неверный промежуток времени";
     case edit && editedEvent.value.start.valueOf() > editedEvent.value.end.valueOf():
       return "Начало должно быть раньше конца";
