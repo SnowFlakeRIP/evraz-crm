@@ -261,7 +261,7 @@ async function updateLesson(object) {
         }
         console.log(visiting)
 
-        const lesson = await client.query(`update schedule set name = $1, "groupId" = $2, "userId" = $3, "startDate" = $4, "endDate" = $5, "isDone" = $6, visiting = $7 where "sequenceId" = $8 returning *`, [current.name, current.groupId, current.teacherId, current.startDate, current.endDate, current.isDone, visiting, current.sequenceId])
+        const lesson = await client.query(`update schedule set name = $1, "groupId" = $2, "userId" = $3, "startDate" = $4, "endDate" = $5, "isDone" = $6, visiting = $7 where ${object.updateAll ? '"sequenceId"' : '"id"'} = $8 returning *`, [current.name, current.groupId, current.teacherId, current.startDate, current.endDate, current.isDone, visiting, object.updateAll ? current.sequenceId : object.lessonId])
         if (lesson.rowCount === 0) {
             data.message = "Занятие не обновлено"
             data.statusCode = 500

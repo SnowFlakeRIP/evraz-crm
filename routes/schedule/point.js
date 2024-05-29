@@ -76,9 +76,10 @@ module.exports = function (fastify, opts, next) {
                         patternProperties: {
                             "^\\d+$": {enum: ["not_visited", "visited", "sick", "good_reason"]}
                         }
-                    }
+                    },
+                    updateAll: {type: 'boolean'}
                 },
-                required: ['lessonId']
+                required: ['lessonId', 'updateAll']
             }
         },
         async handler(request, reply) {

@@ -8,8 +8,9 @@
     "lint": "eslint . --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "@mdi/font": "7.0.96",
+    "@mdi/font": "^7.0.96",
     "@schedule-x/calendar": "^1.32.0",
+    "@schedule-x/calendar-controls": "^1.42.1",
     "@schedule-x/drag-and-drop": "^1.32.0",
     "@schedule-x/event-modal": "^1.32.0",
     "@schedule-x/resize": "^1.32.0",

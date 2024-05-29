@@ -23,100 +23,107 @@
           </v-list-item>
           <v-label class="pa-3" v-else>Ничего не найдено</v-label>
         </v-list>
-
       </v-menu>
     </v-text-field>
+    <v-overlay location-strategy="connected">
+      <template v-slot:activator="{ props: activatorProps }">
+        <v-btn v-bind="activatorProps" :icon="filter.course ? 'mdi-filter' : 'mdi-filter-outline'"></v-btn>
+      </template>
+      <template v-slot:default="isActiveFilter">
+        <v-card class="pa-4">
+          <v-select
+            label="Курс"
+            :items="([{title: 'Любой', value: null}]).concat(courses.map(c => {return {title: c.name, value: c.id}}))"
+            variant="outlined"
+            v-model="filter.course"
+            @update:modelValue="filter.group = null; updateEvents()"
+            :hide-details="!filter.course"
+          ></v-select>
+          <v-select
+            label="Группа"
+            :items="([{title: 'Любая', value: null}]).concat(groups.filter(g => g.courseId === filter.course).map(g => {return {title: g.name, value: g.id}}))"
+            variant="outlined"
+            v-model="filter.group"
+            v-if="filter.course"
+            @update:modelValue="updateEvents"
+            hide-details
+          ></v-select>
+        </v-card>
+      </template>
+    </v-overlay>
+    <v-dialog max-width="600" v-if="admin">
+      <template v-slot:activator="{ props: activatorProps }">
+        <!--        <v-btn-->
+        <!--          v-bind="activatorProps"-->
+        <!--          color="surface-variant"-->
+        <!--          text="Добавить занятие"-->
+        <!--          variant="outlined"-->
+        <!--        ></v-btn>-->
+        <v-btn
+          v-bind="activatorProps"
+          color="surface-variant"
+          icon="mdi-plus"
+        ></v-btn>
+      </template>
+      <template v-slot:default="{ isActive }">
+        <v-card title="Добавить занятие">
+          <div class="pa-4">
+            <div style="display: flex; gap: 16px;">
+              <div style="flex-basis: 100%">
+                <v-select
+                  label="Курс"
+                  :items="courses.map(c => {return {title: c.name, value: c.id}})"
+                  variant="outlined"
+                  v-model="selCourse"
+                  @update:modelValue="selGroup = null"
+                ></v-select>
+                <v-select
+                  label="Группа"
+                  :items="selCourse ? groups.filter(g => g.courseId === selCourse).map(g => {return {title: g.name, value: g.id}}) : []"
+                  variant="outlined"
+                  v-model="selGroup"
+                ></v-select>
+                <v-select
+                  label="День недели"
+                  :items = "days.map((d, i) => { return {title: d, value: (i+1)%7} })"
+                  variant="outlined"
+                  v-model="selDay"
+                >
+                </v-select>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 16px;">
+                <DatePicker v-model.range="range" range />
+                <DatePicker mode="time" hide-time-header is24hr v-model.range="rangeTime" range></DatePicker>
+              </div>
+              <!--                <div style="display: flex; justify-content: space-around;">-->
+              <!--                  -->
+              <!--                </div>-->
+            </div>
+            <v-alert
+              type="error"
+              :text="checkError()"
+              v-if="!!checkError()"
+              variant="text"
+            ></v-alert>
+          </div>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              text="Отмена"
+              :disabled="isProcessing"
+              @click="isActive.value = false"
+            ></v-btn>
+            <v-btn
+              text="Добавить"
+              :disabled="!!checkError() || isProcessing"
+              @click="postEvent().then(r => {isActive = false})"
+            ></v-btn>
+          </v-card-actions>
+        </v-card>
+      </template>
+    </v-dialog>
   </v-toolbar>
   <v-main class="main" v-if="loaded === 'true'">
-    <div id="options" style="padding: 8px; display: flex; flex-direction: column; gap: 8px; width: 15vw" v-if="showMenu">
-      <v-dialog max-width="600" v-if="admin">
-        <template v-slot:activator="{ props: activatorProps }">
-          <v-btn
-            v-bind="activatorProps"
-            color="surface-variant"
-            text="Добавить занятие"
-            variant="outlined"
-          ></v-btn>
-        </template>
-        <template v-slot:default="{ isActive }">
-          <v-card title="Добавить занятие">
-            <div class="pa-4">
-              <v-select
-                label="Курс"
-                :items="courses.map(c => {return {title: c.name, value: c.id}})"
-                variant="outlined"
-                v-model="selCourse"
-                @update:modelValue="selGroup = null"
-              ></v-select>
-              <v-select
-                label="Группа"
-                :items="selCourse ? groups.filter(g => g.courseId === selCourse).map(g => {return {title: g.name, value: g.id}}) : []"
-                variant="outlined"
-                v-model="selGroup"
-              ></v-select>
-              <v-select
-                label="День недели"
-                :items = "days.map((d, i) => { return {title: d, value: (i+1)%7} })"
-                variant="outlined"
-                v-model="selDay"
-              >
-              </v-select>
-              <div style="display: flex; justify-content: space-around;">
-                <div style="display: flex; justify-content: space-between;">
-                  <DatePicker v-model.range="range" range />
-                </div>
-                <div style="display: grid">
-                  <span>Начало</span>
-                  <DatePicker mode="time" hide-time-header is24hr v-model="startTime"></DatePicker>
-                </div>
-                <div style="display: grid">
-                  <span>Конец</span>
-                  <DatePicker mode="time" hide-time-header is24hr v-model="endTime"></DatePicker>
-                </div>
-              </div>
-              <v-alert
-                type="error"
-                :text="checkError()"
-                v-if="!!checkError()"
-                variant="text"
-              ></v-alert>
-            </div>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn
-                text="Отмена"
-                :disabled="isProcessing"
-                @click="isActive.value = false"
-              ></v-btn>
-              <v-btn
-                text="Добавить"
-                :disabled="!!checkError() || isProcessing"
-                @click="postEvent().then(r => {isActive = false})"
-              ></v-btn>
-            </v-card-actions>
-          </v-card>
-        </template>
-      </v-dialog>
-      <v-card class="pa-4">
-        <v-select
-          label="Курс"
-          :items="([{title: 'Любой', value: null}]).concat(courses.map(c => {return {title: c.name, value: c.id}}))"
-          variant="outlined"
-          v-model="filter.course"
-          @update:modelValue="filter.group = null; updateEvents()"
-          :hide-details="!filter.course"
-        ></v-select>
-        <v-select
-          label="Группа"
-          :items="([{title: 'Любая', value: null}]).concat(groups.filter(g => g.courseId === filter.course).map(g => {return {title: g.name, value: g.id}}))"
-          variant="outlined"
-          v-model="filter.group"
-          v-if="filter.course"
-          @update:modelValue="updateEvents"
-          hide-details
-        ></v-select>
-      </v-card>
-    </div>
     <div id="calendar" style="flex: 1; overflow-y: scroll; padding: 8px">
       <ScheduleXCalendar :calendar-app="calendarApp"/>
     </div>
@@ -160,7 +167,17 @@
             <template v-slot:default="{ isActive }">
               <v-card title="Редактировать занятие">
                 <div class="pa-4">
-                  <div style="display: flex; justify-content: space-between;">
+                  <div style="display: flex; justify-content: space-around;" v-if="editAll">
+                    <div style="display: grid">
+                      <span>Начало</span>
+                      <DatePicker mode="time" hide-time-header is24hr v-model="startTime"></DatePicker>
+                    </div>
+                    <div style="display: grid">
+                      <span>Конец</span>
+                      <DatePicker mode="time" hide-time-header is24hr v-model="endTime"></DatePicker>
+                    </div>
+                  </div>
+                  <div style="display: flex; justify-content: space-between;" v-else>
                     <div style="display: grid">
                       <span>Начало</span>
                       <DatePicker mode="dateTime" is24hr v-model="editedEvent.start"></DatePicker>
@@ -170,6 +187,7 @@
                       <DatePicker mode="dateTime" is24hr v-model="editedEvent.end"></DatePicker>
                     </div>
                   </div>
+                  <v-checkbox label="Применить ко всем" hide-details v-model="editAll"></v-checkbox>
                   <v-alert
                     type="error"
                     :text="checkError(true)"
@@ -193,7 +211,7 @@
                   <v-btn
                     text="Сохранить"
                     :disabled="!!checkError(true) || isProcessing"
-                    @click="putEvent().then(r => {isActive.value = false})"
+                    @click="putEvent(true, editAll).then(r => {isActive.value = false})"
                   ></v-btn>
                 </v-card-actions>
               </v-card>
@@ -205,7 +223,7 @@
             :color="curEvent.done ? 'info' : ''"
             :prepend-icon="curEvent.done ? 'mdi-check-circle' : 'mdi-check-circle-outline'"
             :disabled="isProcessing"
-            @click="editedEvent.done = !curEvent.done; putEvent(false)"
+            @click="editedEvent.done = !curEvent.done; putEvent(false, false)"
           >{{ curEvent.done ? "Закончено" : "Не проведено" }}
           </v-btn>
         </v-card-actions>
@@ -259,9 +277,11 @@ import {
   viewMonthAgenda,
 } from '@schedule-x/calendar'
 import '@schedule-x/theme-default/dist/index.css'
+import '@mdi/font/css/materialdesignicons.css'
 import {Calendar, DatePicker} from 'v-calendar';
 import 'v-calendar/style.css';
 import {ref, computed} from "vue"
+import {createCalendarControlsPlugin} from "@schedule-x/calendar-controls";
 
 const days = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
 const months = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"]
@@ -310,11 +330,16 @@ let range = ref({
   start: new Date(),
   end: new Date(Date.now()+86400000),
 })
+let rangeTime = ref({
+  start: new Date(0),
+  end: new Date(3600000)
+})
 let isProcessing = ref(false)
 
 let info = ref(false)
 let curEvent = ref({})
 let editedEvent = ref({})
+let editAll = ref(true)
 let events = []
 let filter = ref({
   course: null,
@@ -332,7 +357,7 @@ function checkError(edit = false) {
       return "Укажите день недели"
     case !edit && range.value.start === null || range.value.end === null || range.value.start.valueOf() > range.value.end.valueOf():
       return "Неверный промежуок дат";
-    case !edit && startTime.value === null || endTime.value === null || startTime.value.valueOf() > endTime.value.valueOf():
+    case !edit && rangeTime.value.start === null || rangeTime.value.end === null || rangeTime.value.start.valueOf() > rangeTime.value.end.valueOf():
       return "Неверный промежуток времени";
     case edit && editedEvent.value.start.valueOf() > editedEvent.value.end.valueOf():
       return "Начало должно быть раньше конца";
@@ -340,10 +365,6 @@ function checkError(edit = false) {
       return null
   }
 }
-
-// let canAdd = computed(() => {
-//   start.value.valueOf() <= end.value.valueOf()
-// })
 
 function calendar() {
   return createCalendar({
@@ -376,7 +397,7 @@ function calendar() {
         openEvent(calendarEvent.id)
       }
     },
-    // plugins: [new viewplugin()]
+    plugins: []
   })
 }
 
@@ -492,6 +513,7 @@ async function getEvents() {
   calendarApp = window.calendarApp = calendar()
   loaded.value = "true"
   isProcessing.value = false
+  editAll.value = true
   updateEvents()
 }
 
@@ -502,8 +524,8 @@ async function postEvent() {
     groupId: selGroup.value,
     lessonName: `${courses.value.find(c => c.id === selCourse.value).name} - ${groups.value.find(g => g.id === selGroup.value).name}`,
     teacherId: 1,
-    startTime: s.valueOf(),
-    endTime: e.valueOf(),
+    startTime: rangeTime.value.start.valueOf(),
+    endTime: rangeTime.value.end.valueOf(),
     startDate: range.value.start.valueOf(),
     endDate: range.value.end.valueOf(),
     weekDay: selDay.value
@@ -517,7 +539,7 @@ async function postEvent() {
   getEvents()
 }
 
-async function putEvent(reload = true) {
+async function putEvent(reload = true, all) {
   // curEvent.value = Object.assign({}, editedEvent.value)
   isProcessing.value = true
   const ev = editedEvent.value
@@ -528,7 +550,8 @@ async function putEvent(reload = true) {
     groupId: ev.group,
     startDate: ev.start.valueOf(),
     endDate: ev.end.valueOf(),
-    isDone: ev.done
+    isDone: ev.done,
+    updateAll: all,
   }
   const resp = await fetch(`${api}/schedule`, {
     method: "PUT",
