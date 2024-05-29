@@ -6,7 +6,7 @@
     <!--      <v-label class="ma-1">Месяц, Год</v-label>-->
     <v-btn icon="mdi-menu" @click="showMenu = !showMenu"/>
     <v-spacer></v-spacer>
-    <v-text-field label="Поиск" hide-details class="ma-2" :disabled="loaded !== 'true'" v-model="search" @update:model-value="updateFilter">
+    <v-text-field label="Поиск" hide-details class="ma-2" :disabled="loaded !== 'true' || isProcessing" v-model="search" @update:model-value="updateFilter">
       <v-menu activator="parent">
         <v-list>
           <v-label class="pa-3" v-if="!search">Начните печатать</v-label>
@@ -28,7 +28,7 @@
     </v-text-field>
     <v-overlay location-strategy="connected">
       <template v-slot:activator="{ props: activatorProps }">
-        <v-btn v-bind="activatorProps" :icon="filter.course ? 'mdi-filter' : 'mdi-filter-outline'"></v-btn>
+        <v-btn v-bind="activatorProps" :icon="filter.course ? 'mdi-filter' : 'mdi-filter-outline'" :disabled="loaded !== 'true' || isProcessing"></v-btn>
       </template>
       <template v-slot:default="isActive">
         <v-card class="pa-4">
@@ -65,6 +65,7 @@
           color="surface-variant"
           icon="mdi-plus"
           variant="flat"
+          :disabled="loaded !== 'true' || isProcessing"
         >
         </v-btn>
       </template>
@@ -492,8 +493,12 @@ function updateEvents() {
 async function getEvents() {
   loaded.value = "false"
   isProcessing.value = true
-  const data = await fetch(`${api}/schedule/all`, {method: "GET"})
-  if (data.status !== 200) {
+  let status, data
+  try {
+    data = await fetch(`${api}/schedule/all`, {method: "GET"})
+    status = data.status
+  } catch (e) {status = 0}
+  if (status !== 200) {
     loaded.value = "error"
     isProcessing.value = false
     return
