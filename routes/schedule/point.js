@@ -97,8 +97,9 @@ module.exports = function (fastify, opts, next) {
                 type: 'object',
                 properties: {
                     lessonId: {type: 'number'},
+                    deleteAll: {type: 'boolean'}
                 },
-                required: ['lessonId']
+                required: ['lessonId', 'deleteAll']
             }
         },
         async handler(request, reply) {

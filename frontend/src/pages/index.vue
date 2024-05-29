@@ -9,12 +9,13 @@
     <v-text-field label="Поиск" hide-details class="ma-2" :disabled="loaded !== 'true'" v-model="search" @update:model-value="updateFilter">
       <v-menu activator="parent">
         <v-list>
+          <v-label class="pa-3" v-if="!search">Начните печатать</v-label>
           <v-list-item
             v-for="item in filterSearch"
             :key="item.id"
             :value="item.id"
             @click="openEvent(item.id)"
-            v-if="filterSearch.length > 0"
+            v-else-if="filterSearch.length > 0"
           >
             <v-list-item-title>{{ courses.find(c => c.id === item.course).name }}</v-list-item-title>
             <v-list-item-subtitle>
@@ -63,7 +64,9 @@
           v-bind="activatorProps"
           color="surface-variant"
           icon="mdi-plus"
-        ></v-btn>
+          variant="flat"
+        >
+        </v-btn>
       </template>
       <template v-slot:default="{ isActive }">
         <v-card title="Добавить занятие">
@@ -116,7 +119,7 @@
             <v-btn
               text="Добавить"
               :disabled="!!checkError() || isProcessing"
-              @click="postEvent().then(r => {isActive = false})"
+              @click="postEvent().then(r => {isActive.value = false})"
             ></v-btn>
           </v-card-actions>
         </v-card>
@@ -170,11 +173,11 @@
                   <div style="display: flex; justify-content: space-around;" v-if="editAll">
                     <div style="display: grid">
                       <span>Начало</span>
-                      <DatePicker mode="time" hide-time-header is24hr v-model="startTime"></DatePicker>
+                      <DatePicker mode="time" hide-time-header is24hr v-model="editedEvent.start"></DatePicker>
                     </div>
                     <div style="display: grid">
                       <span>Конец</span>
-                      <DatePicker mode="time" hide-time-header is24hr v-model="endTime"></DatePicker>
+                      <DatePicker mode="time" hide-time-header is24hr v-model="editedEvent.end"></DatePicker>
                     </div>
                   </div>
                   <div style="display: flex; justify-content: space-between;" v-else>
@@ -199,7 +202,7 @@
                   <v-btn
                     text="Удалить"
                     :disabled="isProcessing"
-                    @click="() => {deleteEvent().then(r => {if (r) isActive.value = false})}"
+                    @click="() => {deleteEvent(editAll).then(r => {if (r) isActive.value = false})}"
                     color="error"
                   ></v-btn>
                   <v-spacer></v-spacer>
@@ -543,11 +546,22 @@ async function putEvent(reload = true, all) {
   // curEvent.value = Object.assign({}, editedEvent.value)
   isProcessing.value = true
   const ev = editedEvent.value
+  // let event = {
+  //   lessonId: ev.id,
+  //   lessonName: `${courses.value.find(c => c.id === ev.course).name} - ${groups.value.find(g => g.id === ev.group).name}`,
+  //   teacherId: 1,
+  //   groupId: ev.group,
+  //   startDate: ev.start.valueOf(),
+  //   endDate: ev.end.valueOf(),
+  //   isDone: ev.done,
+  //   updateAll: all,
+  // }
+  // let [s, e] = [new Date(ev.start), new Date(ev.end)]
+  // if (editAll) {
+  //   s.setUTCFullYear(1970, 0, 1); e.setUTCFullYear(1970, 0, 1)
+  // }
   let event = {
     lessonId: ev.id,
-    lessonName: `${courses.value.find(c => c.id === ev.course).name} - ${groups.value.find(g => g.id === ev.group).name}`,
-    teacherId: 1,
-    groupId: ev.group,
     startDate: ev.start.valueOf(),
     endDate: ev.end.valueOf(),
     isDone: ev.done,
@@ -565,25 +579,30 @@ async function putEvent(reload = true, all) {
   if (reload) getEvents()
 }
 
-async function deleteEvent() {
-  const count = events.value.filter(e => e.sequence === curEvent.value.sequence)
-  let a = ""
-  switch (true) {
-    case count.length%10 === 1 && count.length%100 !== 11:
-      a = "занятие будет удалено"
-      break
-    case count.length%10 >= 2 && count.length%10 <= 4:
-      a = "занятия будут удалены"
-      break
-    default:
-      a = "занятий будут удалены"
-      break
+async function deleteEvent(all) {
+  let s = ""
+  if (all) {
+    const count = events.value.filter(e => e.sequence === curEvent.value.sequence)
+    let a = ""
+    switch (true) {
+      case count.length%10 === 1 && count.length%100 !== 11:
+        a = "занятие будет удалено"
+        break
+      case count.length%10 >= 2 && count.length%10 <= 4:
+        a = "занятия будут удалены"
+        break
+      default:
+        a = "занятий будут удалены"
+        break
+    }
+    s = `${count.length} ${a}. `
   }
-  if (!confirm(`${count.length} ${a}. Вы уверены?`)) return //лень делать нормальный диалог пока что
+
+  if (!confirm(`${s}Вы уверены?`)) return //лень делать нормальный диалог пока что
   isProcessing.value = true
   const resp = await fetch(`${api}/schedule`, {
     method: "DELETE",
-    body: JSON.stringify({lessonId: curEvent.value.id}),
+    body: JSON.stringify({lessonId: curEvent.value.id, deleteAll: all}),
     headers: {"Content-Type": "application/json"}
   })
   if (resp.status !== 200) {isProcessing.value = false; return alert("Ошибка")}
