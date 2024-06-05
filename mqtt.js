@@ -1,16 +1,20 @@
-const axios = require('axios');
-const mqttOptions = {
-    host: process.env.MQTT_HOST,
-    port: process.env.MQTT_PORT,
-    keepalive: 0,
-};
-const mqtt = require('mqtt');
-const mqttClient = mqtt.connect( mqttOptions)
+const chel= document.getElementById('ima')
+const komu= document.getElementById('komu')
+const text= document.getElementById('sms')
+const butt= document.getElementById('otp')
+
+const mqttClient = mqtt.connect("ws://localhost:9001")
+
+
+function otpravka() {
+    mqttClient.subscribe('/'+komu.value+'-'+chel.value)
+    mqttClient.subscribe('/'+chel.value+'-'+komu.value)
+    pushMQTT(['/'+komu.value+'-'+chel.value],JSON.stringify({message:text.value}))
+}
 mqttClient.on('connect', function () {
     console.log('MQTT connection OK')
     console.log(`Is client connected: ${mqttClient.connected}`);
     // mqttClient.subscribe('chat-alive')
-    mqttClient.subscribe('/test')
 })
 mqttClient.on('close', function () {
     console.log('MQTT close OK')
@@ -20,7 +24,11 @@ mqttClient.on("error",function(error) {
 })
 mqttClient.on('message',(topic, message) => {
     console.log(topic)
-    console.log(JSON.parse(message))
+    console.log(topic.indexOf(chel.value))
+    if (topic.indexOf(chel.value)===1){
+        console.log(JSON.parse(message))
+    }
+    // console.log(JSON.parse(message))
 });
 function pushMQTT(topics, message) {
     if(mqttClient)
@@ -44,9 +52,4 @@ function pushMQTT(topics, message) {
     }
 }
 
-pushMQTT(['/test'],JSON.stringify({message:'fuck you'}))
-axios.post('http://127.0.0.1:8000/api/chat/create',{
-    userId:1,
-    messageValue:"fuck you",
-    fromUserId:1
-})
+butt.addEventListener('click',otpravka)

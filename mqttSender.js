@@ -1,16 +1,16 @@
-import axios from "axios";
+
 const mqttOptions = {
     host: process.env.MQTT_HOST,
     port: process.env.MQTT_PORT,
     keepalive: 0,
 };
 const mqtt = require('mqtt');
-const mqttClient = mqtt.connect( mqttOptions)
+const mqttClient = mqtt.connect("ws://broker.hivemq.com:8000/mqtt")
 mqttClient.on('connect', function () {
     console.log('MQTT connection OK')
     console.log(`Is client connected: ${mqttClient.connected}`);
     // mqttClient.subscribe('chat-alive')
-    mqttClient.subscribe('/test')
+    mqttClient.subscribe('/1-1')
 })
 mqttClient.on('close', function () {
     console.log('MQTT close OK')
@@ -44,4 +44,3 @@ function pushMQTT(topics, message) {
     }
 }
 
-pushMQTT(['/test'],JSON.stringify({message:'hello'}))
