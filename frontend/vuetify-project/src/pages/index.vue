@@ -13,10 +13,8 @@
         {{ chatTitle }}
         <span class="close-icon" @click="closeChat">×</span>
       </div>
-      <div id="chatMessages" class="chat-messages" ref="chatMessages" v-for="(message, index) in chatMessages" :key="index">
-        <div class="message" v-if="message[0]===0">{{ message[1] }}</div>
-        <div class="messageOtp" v-else>{{ message[1] }}</div>
-
+      <div id="chatMessages" class="chat-messages" ref="chatMessages" >
+        <div :class="{'message': message[0]===0, 'messageOtp': message[0]===1}" v-for="(message, index) in chatMessages" :key="index">{{ message[1] }}</div>
       </div>
       <div class="input-container">
         <input type="text" v-model="messageInput" @keydown.enter.prevent="sendMessage" placeholder="Введите сообщение...">
@@ -121,6 +119,7 @@ export default {
     scrollChatToBottom() {
       this.$nextTick(() => {
         const chatMessages = this.$refs.chatMessages;
+        console.log(chatMessages)
         chatMessages.scrollTop = chatMessages.scrollHeight;
       });
     }
@@ -233,9 +232,7 @@ body {
   word-break: break-all;
 }
 .messageOtp {
-  position: absolute;
-  left: 0;
-  background-color: #d8d8d8;
+  background-color: #f30606;
   border-radius: 10px;
   padding: 10px;
   margin: 5px 0;
