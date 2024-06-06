@@ -11,7 +11,6 @@
     <div v-if="isChatOpen" class="mini-chat">
       <div class="chat-header">
         {{ chatTitle }}
-
         <span class="close-icon" @click="closeChat">×</span>
       </div>
       <div id="chatMessages" class="chat-messages" ref="chatMessages" v-for="(message, index) in chatMessages" :key="index">
