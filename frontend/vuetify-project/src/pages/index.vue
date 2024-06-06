@@ -13,10 +13,8 @@
         {{ chatTitle }}
         <span class="close-icon" @click="closeChat">×</span>
       </div>
-      <div id="chatMessages" class="chat-messages" ref="chatMessages" v-for="(message, index) in chatMessages" :key="index">
-        <div class="message" v-if="message[0]===0">{{ message[1] }}</div>
-        <div class="messageOtp" v-else>{{ message[1] }}</div>
-
+      <div id="chatMessages" class="chat-messages" ref="chatMessages">
+        <div class="message" v-for="(message, index) in chatMessages" :key="index">{{ message }}</div>
       </div>
       <div class="input-container">
         <input type="text" v-model="messageInput" @keydown.enter.prevent="sendMessage" placeholder="Введите сообщение...">
@@ -27,12 +25,52 @@
 </template>
 
 <script>
-import mqtt from 'mqtt';
+const mqttClient = mqtt.connect("ws://localhost:9001")
+mqttClient.subscribe('/test')
+mqttClient.on('connect', function () {
+  console.log('MQTT connection OK')
+  console.log(`Is client connected: ${mqttClient.connected}`);
+  // mqttClient.subscribe('chat-alive')
+})
+mqttClient.on('close', function () {
+  console.log('MQTT close OK')
+})
+mqttClient.on("error",function(error) {
+  console.log("Can't connect MQTT "+ error)
+})
+mqttClient.on('message',(topic, message) => {
+  console.log(topic)
+  console.log(JSON.parse(message))
+  // console.log(topic.indexOf(chel.value))
+  // if (topic.indexOf(chel.value)===1){
+  //   console.log(JSON.parse(message))
+  // }
+  // console.log(JSON.parse(message))
+});
+function pushMQTT(topics, message) {
+  if(mqttClient)
+  {
+    for(let t of topics)
+    {
+      try
+      {
+        mqttClient.publish(t, message)
+      }
+      catch (e) {
+        console.log(e)
+      }
 
+    }
+    console.log('MQTT push OK')
+  }
+  else
+  {
+    console.log('Please wait mqtt connect')
+  }
+}
 export default {
   data() {
     return {
-      mqttClient: mqtt.connect("ws://broker.hivemq.com:8000/mqtt"),
       isChatOpen: false,
       iconsVisible: false,
       chatMessages: [],
@@ -41,57 +79,7 @@ export default {
       currentChat: '',
     };
   },
-
-  created() {
-    this.mqttClient.subscribe('/test')
-    this.mqttClient.on('connect', function () {
-      console.log('MQTT connection OK')
-      // console.log(`Is client connected: ${this.mqttClient.connected}`);
-      // mqttClient.subscribe('chat-alive')
-    })
-    this.mqttClient.on('close', function () {
-      console.log('MQTT close OK')
-    })
-    this.mqttClient.on("error",function(error) {
-      console.log("Can't connect MQTT "+ error)
-    })
-    this.mqttClient.on('message',(topic, message) => {
-      console.log(topic)
-      if (JSON.parse(message).otp!=="я"){
-        this.chatMessages.push([1,JSON.parse(message).message])
-        this.saveMessages();
-        this.scrollChatToBottom();
-      }
-      // console.log(topic.indexOf(chel.value))
-      // if (topic.indexOf(chel.value)===1){
-      //   console.log(JSON.parse(message))
-      // }
-      // console.log(JSON.parse(message))
-    });
-  },
-
   methods: {
-    pushMQTT(topics, message) {
-      if(this.mqttClient)
-      {
-        for(let t of topics)
-        {
-          try
-          {
-            this.mqttClient.publish(t, message)
-          }
-          catch (e) {
-            console.log(e)
-          }
-
-        }
-        console.log('MQTT push OK')
-      }
-      else
-      {
-        console.log('Please wait mqtt connect')
-      }
-    },
     toggleIcons() {
       this.iconsVisible = !this.iconsVisible;
     },
@@ -108,8 +96,8 @@ export default {
     },
     sendMessage() {
       if (this.messageInput.trim() !== '') {
-        this.chatMessages.push([0,this.messageInput.trim()]);
-        this.pushMQTT(['/test'],JSON.stringify({message:this.messageInput.trim(),otp:"я"}))
+        this.chatMessages.push(this.messageInput.trim());
+        pushMQTT(['/test'],JSON.stringify({message:this.messageInput.trim()}))
         this.messageInput = '';
         this.saveMessages();
         this.scrollChatToBottom();
@@ -230,19 +218,6 @@ body {
   width: fit-content;
   max-width: 80%;
   align-self: flex-end;
-  word-break: break-all;
-}
-.messageOtp {
-  position: absolute;
-  left: 0;
-  background-color: #d8d8d8;
-  border-radius: 10px;
-  padding: 10px;
-  margin: 5px 0;
-  width: fit-content;
-  max-width: 80%;
-  align-self: flex-end;
-  word-break: break-all;
 }
 
 /* Стили для контейнера ввода */
@@ -251,11 +226,10 @@ body {
   align-items: center;
   padding: 10px;
   border-top: 1px solid #ccc;
-  position: absolute;
-  width: 100%;
+  position: sticky;
   bottom: 0;
   background-color: #f5f5f5;
-  //margin-top: 15px; /* Опущено на 15 пикселей вниз */
+  margin-bottom: 15px; /* Опущено на 15 пикселей вниз */
 }
 
 .input-container input {
