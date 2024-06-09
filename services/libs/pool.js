@@ -2,14 +2,13 @@ const Pool = require('pg-pool');
 const config = {
     user:                    process.env.DB_USER,
     password:                process.env.DB_PASSWORD,
-    host:                    process.env.DB_HOST,
+    host:                    'localhost',
     port:                    process.env.DB_PORT,
     database:                process.env.DB_DATABASE,
     ssl:                     false,
     connectionTimeoutMillis: 10000,
     max:                     15,
 };
-
 const pool = new Pool(config);
 
 pool.on('error', (error, client) => {

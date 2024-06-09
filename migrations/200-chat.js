@@ -9,8 +9,8 @@ exports.up = pgm => {
         userId:{
             type: `bigint`
         },
-        fromUserId:{
-            type: `bigint`,
+        dialogId:{
+            type: `varchar(255)`,
         },
         date: {
             type: `timestamp with time zone`,

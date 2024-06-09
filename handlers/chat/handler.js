@@ -25,13 +25,13 @@ async function createMessage(object) {
         //     return data
         // }
         // const password = await bcrypt.hashSync(object.userPassword, 10);
-        const createUser = await  client.query(`INSERT INTO message("userId","messageValue","fromuserid")
+        const createUser = await  client.query(`INSERT INTO message("userId","messageValue","dialogId")
                                                VALUES ($1, $2,$3)
                                                RETURNING "messageId"`,
             [
                 object.userId,
                 object.messageValue,
-                object.fromUserId
+                object.dialogId
             ],
         );
         // if (checkUser.rows.length > 0) {
@@ -81,9 +81,11 @@ async function updateMessage(object){
     const  funcName = 'updateMessage'
     const client = await pool.connect()
     try {
-        const message = await client.query(`select "messageValue"
-                                         from message
-                                         where "userId"=$1`,[object.userId])
+        const message = await client.query(`select "messageValue","userId"
+                                            from message
+                                            where "dialogId"=$1
+                                            ORDER BY "date" ASC
+                                            `,[object.dialogId])
 
         data.message="excellent"
         data.statusCode=200

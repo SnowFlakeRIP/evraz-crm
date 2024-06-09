@@ -26,7 +26,7 @@
 
 <script>
 import mqtt from 'mqtt';
-
+import axios from "axios"
 export default {
   data() {
     return {
@@ -41,6 +41,7 @@ export default {
   },
 
   created() {
+
     this.mqttClient.subscribe('/test')
     this.mqttClient.on('connect', function () {
       console.log('MQTT connection OK')
@@ -93,12 +94,25 @@ export default {
     toggleIcons() {
       this.iconsVisible = !this.iconsVisible;
     },
-    openChat(title, chatKey) {
+    async openChat(title, chatKey) {
       this.chatTitle = title;
       this.currentChat = chatKey;
-      this.chatMessages = JSON.parse(localStorage.getItem(chatKey)) || [];
       this.isChatOpen = true;
       this.iconsVisible = false;
+      this.chatMessages=[]
+      // this.chatMessages = JSON.parse(localStorage.getItem(chatKey)) || [];
+      const otvet = await axios.post("http://127.0.0.1:8000/api/chat/update",{
+        dialogId:"1-2"
+      })
+      console.log(otvet.data)
+      for (let i of otvet.data.messageValue){
+        if (i.userId==1){
+          this.chatMessages.push([0,i.messageValue]);
+        } else{
+          this.chatMessages.push([1,i.messageValue]);
+        }
+      }
+      console.log(this.chatMessages)
     },
     closeChat() {
       this.isChatOpen = false;
@@ -108,9 +122,15 @@ export default {
       if (this.messageInput.trim() !== '') {
         this.chatMessages.push([0,this.messageInput.trim()]);
         this.pushMQTT(['/test'],JSON.stringify({message:this.messageInput.trim(),otp:"я"}))
-        this.messageInput = '';
+
         this.saveMessages();
         this.scrollChatToBottom();
+        axios.post("http://127.0.0.1:8000/api/chat/create",{
+          dialogId:"1-2",
+          userId: 1,
+          messageValue: this.messageInput.trim(),
+        })
+        this.messageInput = '';
       }
     },
     saveMessages() {

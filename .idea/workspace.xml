@@ -4,8 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4a4d9d59-0924-4611-b153-f5e0f66d2d0b" name="Changes" comment="gggg">
+    <list default="true" id="4a4d9d59-0924-4611-b153-f5e0f66d2d0b" name="Changes" comment="mqtt">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/vuetify-project/src/pages/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/vuetify-project/src/pages/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handlers/chat/handler.js" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/chat/handler.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/main.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/200-chat.js" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/200-chat.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/libs/pool.js" beforeDir="false" afterPath="$PROJECT_DIR$/services/libs/pool.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -16,6 +23,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="HTML File" />
+        <option value="JavaScript File" />
       </list>
     </option>
   </component>
@@ -52,6 +60,7 @@
     &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
     &quot;Node.js.mqtt.js.executor&quot;: &quot;Run&quot;,
     &quot;Node.js.mqttSender.js.executor&quot;: &quot;Run&quot;,
+    &quot;Node.js.pool.js.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;Shremf/chat&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/shrem/OneDrive/Рабочий стол/evraz-crm-Alex_L13+Nikitos-dev-copy-evraz&quot;,
@@ -62,21 +71,21 @@
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;npm.build.executor&quot;: &quot;Run&quot;,
     &quot;npm.dev.executor&quot;: &quot;Run&quot;,
+    &quot;npm.migrate.executor&quot;: &quot;Run&quot;,
     &quot;npm.preview.executor&quot;: &quot;Run&quot;,
+    &quot;npm.start.executor&quot;: &quot;Run&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.fonts.default&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;/snap/webstorm/373/plugins/javascript-plugin/jsLanguageServicesImpl/external&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\WebStorm 2024.1.3\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;
+    ]
   }
 }</component>
-  <component name="RunManager" selected="npm.dev">
-    <configuration name="build" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
-      <package-json value="$PROJECT_DIR$/frontend/vuetify-project/package.json" />
-      <command value="run" />
-      <scripts>
-        <script value="build" />
-      </scripts>
-      <node-interpreter value="project" />
-      <envs />
+  <component name="RunManager" selected="npm.start">
+    <configuration name="pool.js" type="NodeJSConfigurationType" temporary="true" nameIsGenerated="true" path-to-js-file="$PROJECT_DIR$/services/libs/pool.js" working-dir="$PROJECT_DIR$/services/libs">
       <method v="2" />
     </configuration>
     <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
@@ -84,6 +93,16 @@
       <command value="run" />
       <scripts>
         <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="migrate" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="migrate" />
       </scripts>
       <node-interpreter value="project" />
       <envs />
@@ -99,11 +118,23 @@
       <envs />
       <method v="2" />
     </configuration>
+    <configuration name="start" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="start" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="npm.start" />
+        <item itemvalue="npm.migrate" />
         <item itemvalue="npm.dev" />
+        <item itemvalue="Node.js.pool.js" />
         <item itemvalue="npm.preview" />
-        <item itemvalue="npm.build" />
       </list>
     </recent_temporary>
   </component>
@@ -130,6 +161,11 @@
       <workItem from="1717615242587" duration="753000" />
       <workItem from="1717661234894" duration="618000" />
       <workItem from="1717661868181" duration="1507000" />
+      <workItem from="1717690540824" duration="226000" />
+      <workItem from="1717690817867" duration="46000" />
+      <workItem from="1717690884393" duration="4572000" />
+      <workItem from="1717865148201" duration="7898000" />
+      <workItem from="1717876785485" duration="35000" />
     </task>
     <task id="LOCAL-00001" summary="mqtt">
       <option name="closed" value="true" />
@@ -139,15 +175,42 @@
       <option name="project" value="LOCAL" />
       <updated>1717615977944</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="mqtt">
+      <option name="closed" value="true" />
+      <created>1717670629891</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1717670629891</updated>
+    </task>
+    <task id="LOCAL-00003" summary="mqtt">
+      <option name="closed" value="true" />
+      <created>1717673847191</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1717673847191</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ID_ORDER">
+      <list>
+        <option value="Default.Root" />
+        <option value="Default.Author" />
+        <option value="Default.Date" />
+        <option value="Default.Subject" />
+        <option value="GitHub.CommitStatus" />
+      </list>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="mqtt" />
     <MESSAGE value="gggg" />
-    <option name="LAST_COMMIT_MESSAGE" value="gggg" />
+    <MESSAGE value="mqtt" />
+    <option name="LAST_COMMIT_MESSAGE" value="mqtt" />
   </component>
 </project>
