@@ -101,7 +101,7 @@ export default {
       this.iconsVisible = false;
       this.chatMessages=[]
       // this.chatMessages = JSON.parse(localStorage.getItem(chatKey)) || [];
-      const otvet = await axios.post("http://127.0.0.1:8000/api/chat/update",{
+      const otvet = await axios.post("http://localhost:8000/api/chat/update",{
         dialogId:"1-2"
       })
       console.log(otvet.data)
@@ -125,7 +125,7 @@ export default {
 
         this.saveMessages();
         this.scrollChatToBottom();
-        axios.post("http://127.0.0.1:8000/api/chat/create",{
+        axios.post("http://localhost:8000/api/chat/create",{
           dialogId:"1-2",
           userId: 1,
           messageValue: this.messageInput.trim(),
@@ -252,13 +252,13 @@ body {
   word-break: break-all;
 }
 .messageOtp {
-  background-color: #f30606;
+  background-color: #d8d8d8;
   border-radius: 10px;
   padding: 10px;
   margin: 5px 0;
   width: fit-content;
   max-width: 80%;
-  align-self: flex-end;
+  align-self: flex-start;
   word-break: break-all;
 }
 

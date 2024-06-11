@@ -7,12 +7,6 @@
     <list default="true" id="4a4d9d59-0924-4611-b153-f5e0f66d2d0b" name="Changes" comment="mqtt">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/vuetify-project/src/pages/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/vuetify-project/src/pages/index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/handlers/chat/handler.js" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/chat/handler.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/main.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/200-chat.js" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/200-chat.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/libs/pool.js" beforeDir="false" afterPath="$PROJECT_DIR$/services/libs/pool.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,7 +78,7 @@
     ]
   }
 }</component>
-  <component name="RunManager" selected="npm.start">
+  <component name="RunManager" selected="npm.dev">
     <configuration name="pool.js" type="NodeJSConfigurationType" temporary="true" nameIsGenerated="true" path-to-js-file="$PROJECT_DIR$/services/libs/pool.js" working-dir="$PROJECT_DIR$/services/libs">
       <method v="2" />
     </configuration>
@@ -130,9 +124,9 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="npm.dev" />
         <item itemvalue="npm.start" />
         <item itemvalue="npm.migrate" />
-        <item itemvalue="npm.dev" />
         <item itemvalue="Node.js.pool.js" />
         <item itemvalue="npm.preview" />
       </list>
@@ -166,6 +160,8 @@
       <workItem from="1717690884393" duration="4572000" />
       <workItem from="1717865148201" duration="7898000" />
       <workItem from="1717876785485" duration="35000" />
+      <workItem from="1717919477009" duration="2573000" />
+      <workItem from="1718026860957" duration="1894000" />
     </task>
     <task id="LOCAL-00001" summary="mqtt">
       <option name="closed" value="true" />
@@ -191,7 +187,15 @@
       <option name="project" value="LOCAL" />
       <updated>1717673847191</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="mqtt">
+      <option name="closed" value="true" />
+      <created>1717919511254</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1717919511254</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
